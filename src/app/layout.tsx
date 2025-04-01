@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -49,7 +50,7 @@ export const metadata: Metadata = {
     "Game Conference Bingo",
   ],
   openGraph: {
-    title: "Video Game Conference Bingo",
+    title: "Video Game Predicition Bingo",
     description:
       "Create and play prediction bingo for video game events like Nintendo Direct, PlayStation State of Play, and Xbox Games Showcase.",
     url: "https://your-bingo-app.com",
@@ -138,6 +139,7 @@ export default function RootLayout({
           }}
         />
       </head>
+      <SpeedInsights />
       <body>{children}</body>
     </html>
   );
