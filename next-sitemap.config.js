@@ -1,4 +1,4 @@
 module.exports = {
-  siteUrl: "https://binge.com",
+  siteUrl: "https://videogamebingo.com",
   generateRobotsTxt: true,
 };

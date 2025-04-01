@@ -79,7 +79,7 @@ export default function RootLayout({
           content="Nintendo Direct Bingo Card, Nintendo Direct Bingo, Nintendo Direct Bingo Card Maker, Nintendo Direct Prediction Bingo, Nintendo Direct Prediction Bingo Card, Nintendo Direct Prediction Bingo Card Maker, PlayStation State of Play Bingo Card, PlayStation State of Play Bingo, PlayStation State of Play Bingo Card Maker, PlayStation State of Play Prediction Bingo, PlayStation State of Play Prediction Bingo Card, PlayStation State of Play Prediction Bingo Card Maker, Xbox Games Showcase Bingo Card, Xbox Games Showcase Bingo, Xbox Games Showcase Bingo Card Maker, Xbox Games Showcase Prediction Bingo, Xbox Games Showcase Prediction Bingo Card, Xbox Games Showcase Prediction Bingo Card Maker, Video Game Conference Bingo, Video Game Conference Bingo Card, Video Game Conference Bingo Card Maker, Video Game Conference Prediction Bingo, Video Game Conference Prediction Bingo Card, Video Game Conference Prediction Bingo Card Maker, Video Game Prediction Bingo, Video Game Prediction Bingo Card, Video Game Prediction Bingo Card Maker, Video Game Prediction Bingo Card Maker, Video Game Bingo Card, Video Game Bingo, Video Game Bingo Card Maker, Video Game Prediction Bingo Card, Video Game Prediction Bingo Card Maker, Video Game Prediction Bingo Card Maker, Video Game Conference Bingo Card, Video Game Conference Bingo Card Maker, Video Game Conference Prediction Bingo, Video Game Conference Prediction Bingo Card, Video Game Conference Prediction Bingo Card Maker, Prediction Bingo Game, Game Conference Bingo"
         />
         <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://your-bingo-app.com" />
+        <link rel="canonical" href="https://videogamebingo.com" />
         <link rel="icon" href="/favicon.ico" />
         <script
           type="application/ld+json"
@@ -88,7 +88,7 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "WebApplication",
               name: "Video Game Prediction Bingo",
-              url: "https://your-bingo-app.com",
+              url: "https://videogamebingo.com",
               description:
                 "Play bingo with predictions for video game events like Nintendo Direct, State of Play, and Xbox Games Showcase.",
               keywords: [
