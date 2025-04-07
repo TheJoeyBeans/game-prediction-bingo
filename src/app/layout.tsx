@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import CookieConsent from "./components/CookieConsent";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -138,9 +139,17 @@ export default function RootLayout({
             }),
           }}
         />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9515363363004095"
+          crossOrigin="anonymous"
+        />
       </head>
       <SpeedInsights />
-      <body>{children}</body>
+      <body>
+        {children}
+        <CookieConsent />
+      </body>
     </html>
   );
 }

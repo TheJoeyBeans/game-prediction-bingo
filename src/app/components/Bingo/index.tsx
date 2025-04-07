@@ -3,6 +3,7 @@ import Image from "next/image";
 import logos from "../../utils/logos";
 import { Switch } from "@headlessui/react";
 import { shuffleBoard } from "../../utils/shuffleBoard";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 const getPlatformLogo = (platformColor: string) => {
   switch (platformColor) {
@@ -23,6 +24,7 @@ interface Theme {
   borderColor: string;
   hoverColor: string;
   shadowColor: string;
+  themeName: string;
 }
 
 interface BingoCardProps {
@@ -61,9 +63,15 @@ const BingoCard = ({
     return "text-lg";
   };
 
+  const markerBackground =
+    theme.themeName === "Classic Bingo" ? "bg-black" : "bg-white";
+
   const handleShareClick = () => {
     if (cardUrl) {
       navigator.clipboard.writeText(cardUrl).then(() => {});
+      sendGTMEvent({
+        event: "share_card",
+      });
       setUrlCopied(true);
     }
   };
@@ -160,7 +168,9 @@ const BingoCard = ({
                 Free Space
                 {selectedOptions.includes(index) && (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-[60%] h-[60%] bg-white opacity-80 rounded-full pointer-events-none" />
+                    <div
+                      className={`w-[60%] h-[60%] ${markerBackground} opacity-80 rounded-full pointer-events-none`}
+                    />
                   </div>
                 )}
               </div>
@@ -198,7 +208,9 @@ const BingoCard = ({
               </span>
               {selectedOptions.includes(index) && (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-[60%] h-[60%] bg-white opacity-80 rounded-full pointer-events-none" />
+                  <div
+                    className={`w-[60%] h-[60%] ${markerBackground} opacity-80 rounded-full pointer-events-none`}
+                  />
                 </div>
               )}
             </div>
