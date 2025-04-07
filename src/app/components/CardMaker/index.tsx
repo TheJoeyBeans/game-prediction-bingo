@@ -6,6 +6,7 @@ import { encodeState } from "../../utils/url-helpers";
 import Options from "./Options";
 import ThemePicker from "./ThemePicker";
 import { THEMES } from "../../lib/constants";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 const CardMaker = () => {
   const [includeFreeSpace, setIncludeFreeSpace] = useState(true);
@@ -22,6 +23,10 @@ const CardMaker = () => {
       gridSize,
       options,
     };
+    sendGTMEvent({
+      event: "generate_card",
+      theme: boardTheme.themeName,
+    });
     const stateString = JSON.stringify(state);
     const encodedState = encodeState(stateString);
     const newUrl = `${window.location.origin}${window.location.pathname}?s=${encodedState}`;

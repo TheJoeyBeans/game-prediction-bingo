@@ -1,5 +1,6 @@
 export const THEMES = {
   classicBingo: {
+    themeName: "Classic Bingo",
     backgroundColor: "#ffffff", // Dark background for classic bingo
     textColor: "#000000", // White text for contrast
     borderColor: "#cccccc", // Light gray border for cells
@@ -7,6 +8,7 @@ export const THEMES = {
     shadowColor: "#999999", // Shadow color for depth
   },
   nintendoDirect: {
+    themeName: "Nintendo Direct",
     backgroundColor: "#e60012", // Nintendo red
     textColor: "#ffffff",
     borderColor: "#b3000e",
@@ -14,6 +16,7 @@ export const THEMES = {
     shadowColor: "#99000b",
   },
   playstationStateOfPlay: {
+    themeName: "PlayStation State of Play",
     backgroundColor: "#003087", // PlayStation blue
     textColor: "#ffffff",
     borderColor: "#001f5b",
@@ -21,6 +24,7 @@ export const THEMES = {
     shadowColor: "#001233",
   },
   xbox: {
+    themeName: "Xbox Games Showcase",
     backgroundColor: "#107c10", // Xbox green
     textColor: "#ffffff",
     borderColor: "#0a5a0a",
@@ -28,6 +32,7 @@ export const THEMES = {
     shadowColor: "#083f08",
   },
   gameAwards: {
+    themeName: "Game Awards",
     backgroundColor: "#1a1a1a", // Dark, classy background
     textColor: "#00d4ff", // Neon blue (from their branding)
     borderColor: "#003b4d",
@@ -35,6 +40,7 @@ export const THEMES = {
     shadowColor: "#00000099",
   },
   summerGameFest: {
+    themeName: "Summer Game Fest",
     backgroundColor: "#333366", // Deep blue-purple tone
     textColor: "#ff6bd6", // Vibrant pink from SGF branding
     borderColor: "#290e4e",
