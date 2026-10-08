@@ -1,26 +1,77 @@
 @import "tailwindcss";
 
-/* :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-grotesk), var(--font-inter), ui-sans-serif,
+    system-ui, sans-serif;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Surfaces, darkest to lightest */
+  --color-ink-950: #07080d;
+  --color-ink-900: #0c0e16;
+  --color-ink-800: #141725;
+  --color-ink-700: #1e2234;
+  --color-ink-600: #2b3049;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Text, faintest to brightest */
+  --color-mist-500: #7f85a1;
+  --color-mist-300: #b6bbd3;
+  --color-mist-100: #eef0fa;
+
+  --color-accent-400: #9a82ff;
+  --color-accent-500: #7c5cff;
+  --color-live: #ff3b5c;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+
+  --animate-daub: daub 220ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-live: live 2s ease-in-out infinite;
+
+  @keyframes daub {
+    from {
+      transform: scale(0.3);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1);
+      opacity: 0.85;
+    }
+  }
+
+  @keyframes live {
+    50% {
+      opacity: 0.35;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-} */
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  /* Sizes are rem-based, so this scales the whole UI up on large monitors and TVs */
+  @media (min-width: 1920px) {
+    html {
+      font-size: 112.5%;
+    }
+  }
+  @media (min-width: 2560px) {
+    html {
+      font-size: 125%;
+    }
+  }
+  @media (min-width: 3840px) {
+    html {
+      font-size: 150%;
+    }
+  }
+
+  body {
+    @apply bg-ink-950 font-sans text-mist-100 antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent-400);
+    outline-offset: 2px;
+  }
+}
