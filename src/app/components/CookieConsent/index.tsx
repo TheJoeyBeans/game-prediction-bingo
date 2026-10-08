@@ -1,52 +1,98 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import Script from "next/script";
 import { GoogleTagManager } from "@next/third-parties/google";
-import Cookies from "js-cookie";
+import Button from "../ui/Button";
+import {
+  clearGoogleCookies,
+  grantGoogleConsent,
+  readChoice,
+  saveChoice,
+  type ConsentChoice,
+} from "../../lib/consent";
 
-const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID as string;
+const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+const ADSENSE_SRC =
+  "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9515363363004095";
 
-const CookieConsent = () => {
-  const [cookieState, setCookieState] = useState("not-answered");
+const ConsentContext = createContext({ openCookieSettings: () => {} });
+
+export const useConsent = () => useContext(ConsentContext);
+
+// Google Tag Manager and AdSense load only after the visitor accepts
+const CookieConsent = ({ children }: { children: ReactNode }) => {
+  const [choice, setChoice] = useState<ConsentChoice | null>(null);
+  const [bannerOpen, setBannerOpen] = useState(false);
 
   useEffect(() => {
-    const state = Cookies.get("cookie-consent-state");
-    if (state) setCookieState(state);
+    const saved = readChoice();
+    if (saved === "accepted") grantGoogleConsent();
+    setChoice(saved);
+    setBannerOpen(saved === null);
   }, []);
 
-  const handleConsent = (state: string) => {
-    Cookies.set("cookie-consent-state", state, { expires: 365 });
-    setCookieState(state);
+  const handleChoice = (next: ConsentChoice) => {
+    saveChoice(next);
+    setBannerOpen(false);
+
+    if (choice === "accepted" && next === "rejected") {
+      // Loaded scripts can't be unloaded, so clear their cookies and start a fresh page
+      clearGoogleCookies();
+      window.location.reload();
+      return;
+    }
+
+    if (next === "accepted") grantGoogleConsent();
+    setChoice(next);
   };
 
-  if (cookieState === "accepted") {
-    return <GoogleTagManager gtmId={GTM_ID} />;
-  }
-
-  if (cookieState === "rejected") {
-    return null;
-  }
-
   return (
-    <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white border border-gray-200 shadow-lg rounded-xl p-4 w-full text-center max-w-md z-50">
-      <p className="text-sm text-gray-700 mb-3">
-        We use cookies to improve your experience. Do you accept?
-      </p>
-      <div className="flex gap-2">
-        <button
-          onClick={() => handleConsent("accepted")}
-          className="w-full px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
+    <ConsentContext.Provider
+      value={{ openCookieSettings: () => setBannerOpen(true) }}
+    >
+      {children}
+
+      {choice === "accepted" && (
+        <>
+          {GTM_ID && <GoogleTagManager gtmId={GTM_ID} />}
+          <Script src={ADSENSE_SRC} crossOrigin="anonymous" />
+        </>
+      )}
+
+      {bannerOpen && (
+        <div
+          role="dialog"
+          aria-label="Cookie consent"
+          className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-50 rounded-2xl bg-ink-800/95 p-4 shadow-2xl ring-1 ring-white/10 backdrop-blur sm:inset-x-auto sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:p-5"
         >
-          Accept
-        </button>
-        <button
-          onClick={() => handleConsent("rejected")}
-          className="w-full px-4 py-2 text-sm font-medium bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition curisor-pointer"
-        >
-          Reject
-        </button>
-      </div>
-    </div>
+          <p className="mb-4 text-sm text-mist-300">
+            We&apos;d like to use cookies for analytics and to show personalized
+            ads. Nothing loads unless you accept, and you can change your choice
+            anytime from &ldquo;Cookie settings&rdquo; on the home page.
+          </p>
+          <div className="flex gap-2">
+            {/* Equal weight for both choices; the current one is highlighted when reopened */}
+            {(["accepted", "rejected"] as const).map((option) => (
+              <Button
+                key={option}
+                variant={choice === option ? "primary" : "secondary"}
+                className="w-full"
+                onClick={() => handleChoice(option)}
+              >
+                {option === "accepted" ? "Accept" : "Reject"}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+    </ConsentContext.Provider>
   );
 };
 

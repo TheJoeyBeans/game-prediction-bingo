@@ -1,236 +1,163 @@
-import React, { useState } from "react";
-import Image from "next/image";
-import logos from "../../utils/logos";
-import { Switch } from "@headlessui/react";
-import { shuffleBoard } from "../../utils/shuffleBoard";
-import { sendGTMEvent } from "@next/third-parties/google";
+"use client";
 
-const getPlatformLogo = (platformColor: string) => {
-  switch (platformColor) {
-    case "#e60012":
-      return { src: logos.nintendo, width: 350, height: 200 };
-    case "#003087":
-      return { src: logos.playstation, width: 300, height: 200 };
-    case "#107c10":
-      return { src: logos.xbox, width: 150, height: 100 };
-    default:
-      return null;
-  }
+import { useEffect, useState, type CSSProperties } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { sendGTMEvent } from "@next/third-parties/google";
+import Board from "../Board";
+import Backdrop from "../ui/Backdrop";
+import Button, { buttonStyles } from "../ui/Button";
+import Toggle from "../ui/Toggle";
+import Wordmark from "../ui/Wordmark";
+import {
+  ArrowLeftIcon,
+  CheckIcon,
+  ShareIcon,
+  ShuffleIcon,
+} from "../ui/icons";
+import { THEMES } from "../../lib/constants";
+import { PLATFORM_LOGOS } from "../../utils/logos";
+import { shuffleBoard } from "../../utils/shuffleBoard";
+import type { CardState } from "../../utils/url-helpers";
+
+const SHARE_LABELS = {
+  idle: "Share this card",
+  copied: "Link copied!",
+  failed: "Couldn't copy. Use the address bar link.",
 };
 
-interface Theme {
-  backgroundColor: string;
-  textColor: string;
-  borderColor: string;
-  hoverColor: string;
-  shadowColor: string;
-  themeName: string;
-}
+const BingoCard = ({ card }: { card: CardState }) => {
+  const { gridSize, includeFreeSpace, themeKey } = card;
+  const [streamMode, setStreamMode] = useState(false);
+  const [selected, setSelected] = useState(() => new Set<number>());
+  const [options, setOptions] = useState(card.options);
+  const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "failed">(
+    "idle"
+  );
+  const theme = THEMES[themeKey];
+  const platformLogo = PLATFORM_LOGOS[themeKey];
+  // Hidden controls keep their space so the board doesn't jump in stream mode
+  const controlsVisibility = streamMode ? "invisible" : "";
 
-interface BingoCardProps {
-  gridSize: number;
-  options: string[];
-  includeFreeSpace: boolean;
-  theme: Theme;
-  cardUrl?: string;
-}
-
-const BingoCard = ({
-  gridSize,
-  options,
-  includeFreeSpace,
-  theme,
-  cardUrl,
-}: BingoCardProps) => {
-  const [urlCopied, setUrlCopied] = useState(false);
-  const [displayUI, setDisplayUI] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
-  const [displayOptions, setSelectDisplayOptions] = useState(options);
-  const totalCells = gridSize * gridSize;
-  const centerIndex = Math.floor((totalCells - 1) / 2);
-  const platformLogo = getPlatformLogo(theme.backgroundColor);
+  useEffect(() => {
+    if (shareStatus === "idle") return;
+    const timer = setTimeout(() => setShareStatus("idle"), 3000);
+    return () => clearTimeout(timer);
+  }, [shareStatus]);
 
   const handleShuffleBoard = () => {
-    const shuffledOptions = shuffleBoard([...displayOptions]);
-    setSelectedOptions([]);
-    setSelectDisplayOptions(shuffledOptions);
+    setSelected(new Set());
+    setOptions(shuffleBoard([...options]));
   };
 
-  const getTextSize = (text: string) => {
-    if (text.length > 30) return "text-xs";
-    if (text.length > 20) return "text-sm";
-    if (text.length > 10) return "text-base";
-    return "text-lg";
-  };
+  const handleShareClick = async () => {
+    sendGTMEvent({ event: "share_card" });
+    const url = window.location.href;
 
-  const markerBackground =
-    theme.themeName === "Classic Bingo" ? "bg-black" : "bg-white";
+    // Phones and tablets get the native share sheet; desktops copy the link
+    if (navigator.share && window.matchMedia("(pointer: coarse)").matches) {
+      try {
+        await navigator.share({ title: "My video game bingo card", url });
+      } catch {
+        // Share sheet dismissed
+      }
+      return;
+    }
 
-  const handleShareClick = () => {
-    if (cardUrl) {
-      navigator.clipboard.writeText(cardUrl).then(() => {});
-      sendGTMEvent({
-        event: "share_card",
-      });
-      setUrlCopied(true);
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareStatus("copied");
+    } catch {
+      setShareStatus("failed");
     }
   };
 
-  const handleOptionClick = (index: number) => {
-    if (selectedOptions.includes(index)) {
-      setSelectedOptions(selectedOptions.filter((opt) => opt !== index));
-    } else {
-      setSelectedOptions([...selectedOptions, index]);
-    }
+  const handleCellClick = (index: number) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
   };
 
   return (
     <div
-      className={`relative flex justify-center items-center min-h-screen min-w-full`}
-      style={{
-        backgroundColor: theme.shadowColor,
-      }}
+      className="relative flex min-h-dvh flex-col"
+      style={{ "--event": theme.accentColor } as CSSProperties}
     >
-      <button
-        onClick={() => (window.location.href = "/")}
-        className="absolute top-4 left-4 bg-white rounded-2xl py-1 px-3 cursor-pointer shadow-lg hover:bg-gray-300 transition duration-300 ease-in-out"
-        style={{ display: !displayUI ? "block" : "none" }}
-      >
-        Home
-      </button>
-      <button
-        onClick={handleShuffleBoard}
-        className="absolute top-16 left-4 bg-white rounded-2xl py-1 px-3 cursor-pointer shadow-lg hover:bg-gray-300 transition duration-300 ease-in-out"
-        style={{ display: !displayUI ? "block" : "none" }}
-      >
-        Shuffle
-      </button>
+      <Backdrop />
 
-      {platformLogo && (
-        <div className="absolute top-0 mt-10 left-1/2 transform -translate-x-1/2 bg-white p-2 px-10 rounded-lg shadow-md flex items-center justify-center">
-          <Image
-            src={platformLogo.src}
-            alt="Platform Logo"
-            width={platformLogo.width}
-            height={platformLogo.height}
-          />
-        </div>
-      )}
-
-      <div className="absolute top-4 right-4">
-        {!displayUI && (
-          <span className="text-white mr-2 font-semibold">Display UI</span>
-        )}
-        <Switch
-          checked={displayUI}
-          onChange={setDisplayUI}
-          className={`${
-            !displayUI ? "bg-green-500" : "bg-gray-300"
-          } relative inline-flex items-center h-5 w-10 rounded-full shadow-lg transition-colors duration-300 ease-in-out cursor-pointer`}
+      {/* Side columns share the leftover space, so the logo stays centered and never overlaps the controls */}
+      <header className="grid grid-cols-[1fr_minmax(0,28rem)_1fr] items-center gap-3 p-3 sm:p-5">
+        <div
+          className={`flex flex-col items-start gap-2 sm:flex-row ${controlsVisibility}`}
         >
-          <span
-            className={`${
-              !displayUI ? "translate-x-5 bg-white" : "translate-x-1 bg-white"
-            } inline-block h-4 w-4 rounded-full transform transition-transform duration-300`}
-          />
-        </Switch>
-      </div>
+          <Link href="/" className={buttonStyles("secondary", "sm")}>
+            <ArrowLeftIcon />
+            <span className="sr-only sm:not-sr-only">New card</span>
+          </Link>
+          <Button size="sm" onClick={handleShuffleBoard}>
+            <ShuffleIcon />
+            <span className="sr-only sm:not-sr-only">Shuffle</span>
+          </Button>
+        </div>
 
-      <div
-        className={`grid gap-1`}
-        style={{
-          gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
-          boxShadow: `0 4px 8px ${theme.shadowColor}`,
-        }}
-      >
-        {Array.from({ length: totalCells }).map((_, index) => {
-          if (includeFreeSpace && index === centerIndex) {
-            return (
-              <div
-                key={index}
-                className={`relative flex items-center justify-center text-center p-2 h-12 w-12 sm:w-14 sm:h-14 md:w-20 md:h-20 lg:w-22 lg:h-22 xl:w-28 xl:h-28 font-semibold rounded-lg cursor-pointer break-words text-xs sm:text-lg text-ellipsis md:overflow-hidden ${
-                  selectedOptions.includes(index) ? "selected" : ""
-                }`}
-                style={{
-                  backgroundColor: theme.backgroundColor,
-                  color: theme.textColor,
-                  border: `1px solid ${theme.borderColor}`,
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor = theme.hoverColor)
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.backgroundColor =
-                    theme.backgroundColor)
-                }
-                onClick={() => handleOptionClick(index)}
-              >
-                Free Space
-                {selectedOptions.includes(index) && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div
-                      className={`w-[60%] h-[60%] ${markerBackground} opacity-80 rounded-full pointer-events-none`}
-                    />
-                  </div>
-                )}
-              </div>
-            );
-          }
-
-          const optionIndex =
-            includeFreeSpace && index > centerIndex ? index - 1 : index;
-          const option = displayOptions[optionIndex] || "";
-          const textSizeClass = getTextSize(option);
-
-          return (
-            <div
-              key={index}
-              className={`relative flex items-center justify-center text-center p-2 h-12 w-12 sm:w-14 sm:h-14 md:w-20 md:h-20 lg:w-22 lg:h-22 xl:w-28 xl:h-28 font-semibold rounded-lg break-words cursor-pointer ${
-                selectedOptions.includes(index) ? "selected" : ""
-              }`}
-              style={{
-                backgroundColor: theme.backgroundColor,
-                color: theme.textColor,
-                border: `1px solid ${theme.borderColor}`,
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = theme.hoverColor)
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = theme.backgroundColor)
-              }
-              onClick={() => handleOptionClick(index)}
-            >
-              <span
-                className={`break-words sm:${textSizeClass} text-xs text-ellipsis md:overflow-hidden`}
-              >
-                {option}
-              </span>
-              {selectedOptions.includes(index) && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div
-                    className={`w-[60%] h-[60%] ${markerBackground} opacity-80 rounded-full pointer-events-none`}
-                  />
-                </div>
-              )}
+        <div className="flex justify-center">
+          {platformLogo ? (
+            <div className="max-w-full rounded-xl bg-white px-4 py-2 shadow-lg sm:px-6">
+              <Image
+                src={platformLogo}
+                alt={`${theme.themeName} logo`}
+                width={700}
+                className="h-auto max-h-9 w-auto max-w-full sm:max-h-12 lg:max-h-14"
+              />
             </div>
-          );
-        })}
-      </div>
-      <div className="absolute bottom-4">
-        <button
-          onClick={handleShareClick}
-          className="bg-blue-500 text-white py-2 px-4 rounded-xl shadow-lg cursor-pointer hover:bg-blue-600 transition duration-300 ease-in-out"
-          style={{ display: !displayUI ? "block" : "none" }}
-        >
-          Share this Bingo Card
-        </button>
-      </div>
-      {urlCopied && (
-        <div className="absolute bottom-16 text-white py-2 px-4">
-          Copied to clipboard
+          ) : (
+            <Wordmark className="text-base sm:text-xl" />
+          )}
         </div>
-      )}
+
+        <div
+          className={`flex justify-end transition-opacity duration-200 ${
+            streamMode
+              ? "opacity-30 focus-within:opacity-100 hover:opacity-100"
+              : ""
+          }`}
+        >
+          <Toggle
+            label="Stream mode"
+            labelClassName={streamMode ? "sr-only" : "sr-only sm:not-sr-only"}
+            checked={streamMode}
+            onChange={setStreamMode}
+          />
+        </div>
+      </header>
+
+      <main className="flex flex-1 items-center justify-center px-3 py-2 sm:px-6">
+        <Board
+          gridSize={gridSize}
+          options={options}
+          includeFreeSpace={includeFreeSpace}
+          themeKey={themeKey}
+          selected={selected}
+          onCellClick={handleCellClick}
+          fitViewport
+        />
+      </main>
+
+      <footer className="flex justify-center p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:p-6">
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={handleShareClick}
+          aria-live="polite"
+          className={controlsVisibility}
+        >
+          {shareStatus === "copied" ? <CheckIcon /> : <ShareIcon />}
+          {SHARE_LABELS[shareStatus]}
+        </Button>
+      </footer>
     </div>
   );
 };

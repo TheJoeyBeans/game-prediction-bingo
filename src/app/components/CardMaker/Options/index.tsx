@@ -1,146 +1,145 @@
-import React, { useState } from "react";
+import { useState, type ClipboardEvent, type FormEvent } from "react";
+import Button from "../../ui/Button";
+import { CloseIcon, PlusIcon, ShuffleIcon } from "../../ui/icons";
 import { shuffleBoard } from "../../../utils/shuffleBoard";
+import { SAMPLE_OPTIONS } from "../../../lib/sampleOptions";
 
 interface OptionsProps {
-  gridSize: number;
-  setGridSize: (size: number) => void;
-  options: string[] | [];
+  options: string[];
   setOptions: (options: string[]) => void;
-  includeFreeSpace: boolean;
-  setIncludeFreeSpace: (include: boolean) => void;
-  totalCells: number;
-  optionsLength: number;
-  handleGenerateCard: () => void;
+  needed: number;
 }
 
-const Options = ({
-  gridSize,
-  setGridSize,
-  options,
-  setOptions,
-  includeFreeSpace,
-  setIncludeFreeSpace,
-  totalCells,
-  optionsLength,
-  handleGenerateCard,
-}: OptionsProps) => {
+const Options = ({ options, setOptions, needed }: OptionsProps) => {
   const [inputValue, setInputValue] = useState("");
-  const gridSizeOptions = [3, 5, 7]; // Possible grid sizes for the bingo card
+  const count = options.length;
+  const extra = count - needed;
 
-  const handleAddOption = () => {
-    if (inputValue.trim()) {
-      setOptions([...options, inputValue.trim()]);
-      setInputValue("");
-    }
+  const addOptions = (values: string[]) => {
+    const cleaned = values.map((value) => value.trim()).filter(Boolean);
+    if (cleaned.length) setOptions([...options, ...cleaned]);
+  };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    addOptions([inputValue]);
+    setInputValue("");
+  };
+
+  // Pasting several lines adds one prediction per line
+  const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
+    const text = e.clipboardData.getData("text");
+    if (!text.includes("\n")) return;
+    e.preventDefault();
+    addOptions(text.split(/\r?\n/));
   };
 
   const handleDeleteOption = (index: number) => {
-    // Remove the option at the specified index from the options array
-    const newOptions = [...options];
-    newOptions.splice(index, 1);
-    setOptions(newOptions);
+    setOptions(options.filter((_, i) => i !== index));
   };
 
-  const handleShuffleBoard = () => {
-    // Shuffle the options array and update the state
-    const shuffledOptions = shuffleBoard([...options]);
-    setOptions(shuffledOptions);
-  };
+  const status =
+    count < needed
+      ? `${needed - count} more to fill the board`
+      : extra > 0
+        ? `Board is full. ${extra} extra will get mixed in when you shuffle.`
+        : "Board is full. You're ready to go!";
 
   return (
-    <div className="p-6 flex flex-col items-center justify-center">
-      <h2 className="sm:text-2xl font-bold mb-6">Bingo Card Size</h2>
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        {gridSizeOptions.map((size) => (
-          <label key={size} className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              id={`grid-size-${size}`}
-              name="gridSize"
-              value={size}
-              checked={gridSize === size}
-              onChange={(e) => setGridSize(parseInt(e.target.value))}
-              className="w-4 h-4 text-blue-600 accent-blue-600"
-            />
-            <span className="text-lg">
-              {size} x {size}
-            </span>
-          </label>
-        ))}
-      </div>
-
-      <div className="flex items-center gap-2 mb-6">
-        <input
-          type="checkbox"
-          id="include-free-space"
-          checked={includeFreeSpace}
-          onChange={(e) => setIncludeFreeSpace(e.target.checked)}
-          className="w-4 h-4 text-blue-600 accent-blue-600"
-        />
-        <label htmlFor="include-free-space" className="sm:text-lg">
-          Include Free Space
+    <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="flex gap-2">
+        <label htmlFor="new-option" className="sr-only">
+          New prediction
         </label>
-      </div>
-
-      {optionsLength > totalCells && (
-        <div className="bg-yellow-100 text-yellow-700 p-3 rounded-lg mb-6 w-full text-center">
-          You have more options than needed, some options will be cut off.
-        </div>
-      )}
-
-      <div className="flex gap-2 justify-center flex-wrap mx-auto mb-6">
-        {options.map((option, i) => (
-          <div
-            key={option + i}
-            className="relative bg-gray-100 text-gray-800 p-3 rounded-xl text-left border border-gray-300 hover:bg-gray-200 transition-colors duration-150 group"
-          >
-            {option}
-            <button
-              onClick={() => handleDeleteOption(i)}
-              className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full w-6 h-6 cursor-pointer flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-150"
-            >
-              ×
-            </button>
-          </div>
-        ))}
-      </div>
-      {options.length > 1 && (
-        <button
-          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={handleShuffleBoard}
-        >
-          Randomize Order
-        </button>
-      )}
-      <h2 className="sm:text-2xl font-bold mt-4 mb-4">Enter Bingo Options</h2>
-      <div className="flex gap-3 mb-6">
         <input
+          id="new-option"
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleAddOption();
-            }
-          }}
-          className="p-2 sm:p-4 border border-gray-300 rounded-lg w-40 sm:w-64 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          placeholder="Add an option"
+          onPaste={handlePaste}
+          placeholder="e.g. Surprise shadow drop"
+          autoComplete="off"
+          className="h-11 min-w-0 flex-1 rounded-xl bg-ink-950/60 px-4 text-sm text-mist-100 ring-1 ring-inset ring-white/10 placeholder:text-mist-500 focus:ring-2 focus:ring-accent-400 focus:outline-none"
         />
-        <button
-          onClick={handleAddOption}
-          className="bg-blue-500 text-white px-1 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200 cursor-pointer"
+        <Button type="submit" variant="secondary" aria-label="Add prediction">
+          <PlusIcon className="text-base" />
+          <span className="hidden sm:inline">Add</span>
+        </Button>
+      </form>
+      <p className="text-xs text-mist-500">
+        Tip: paste a list to add one prediction per line.
+      </p>
+
+      <div>
+        <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+          <div
+            className={`h-full rounded-full transition-[width] duration-300 ${
+              count >= needed ? "bg-success" : "bg-accent-500"
+            }`}
+            style={{ width: `${Math.min(count / needed, 1) * 100}%` }}
+          />
+        </div>
+        <p
+          className={`mt-2 text-sm ${
+            count >= needed ? "text-success" : "text-mist-300"
+          }`}
+          aria-live="polite"
         >
-          Add Option
-        </button>
+          {status}
+        </p>
       </div>
-      <button
-        onClick={handleGenerateCard}
-        className="bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200"
-        disabled={optionsLength < totalCells}
-      >
-        Generate Bingo Card
-      </button>
+
+      {count > 0 && (
+        <ul className="flex flex-wrap gap-2">
+          {options.map((option, i) => (
+            <li
+              key={`${i}-${option}`}
+              className={`inline-flex max-w-full items-center gap-1 rounded-lg bg-ink-800 py-1 pr-1 pl-3 text-sm ring-1 ring-inset ring-white/10 ${
+                i >= needed ? "opacity-50" : ""
+              }`}
+            >
+              <span className="truncate">{option}</span>
+              <button
+                type="button"
+                onClick={() => handleDeleteOption(i)}
+                aria-label={`Remove "${option}"`}
+                className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-md text-mist-500 transition-colors hover:bg-white/10 hover:text-mist-100"
+              >
+                <CloseIcon />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="flex flex-wrap gap-2">
+        {count > 1 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setOptions(shuffleBoard([...options]))}
+          >
+            <ShuffleIcon /> Shuffle order
+          </Button>
+        )}
+        {count > 0 && (
+          <Button variant="ghost" size="sm" onClick={() => setOptions([])}>
+            Clear all
+          </Button>
+        )}
+        {process.env.NODE_ENV === "development" && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="border border-dashed border-white/20"
+            onClick={() =>
+              setOptions(shuffleBoard([...SAMPLE_OPTIONS]).slice(0, needed))
+            }
+          >
+            Fill with sample options (dev only)
+          </Button>
+        )}
+      </div>
     </div>
   );
 };
