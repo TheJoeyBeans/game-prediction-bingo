@@ -17,6 +17,8 @@ import { useConsent } from "../CookieConsent";
 import { THEMES, type ThemeKey } from "../../lib/constants";
 import { encodeCard } from "../../utils/url-helpers";
 
+const CREATE_TIMEOUT_MS = 5000;
+
 const GRID_SIZES = [3, 5, 7].map((size) => ({
   value: size,
   label: `${size} × ${size}`,
@@ -29,22 +31,44 @@ const CardMaker = () => {
   const [themeKey, setThemeKey] = useState<ThemeKey>("classicBingo");
   const [gridSize, setGridSize] = useState(5);
   const [options, setOptions] = useState<string[]>([]);
+  const [creating, setCreating] = useState(false);
   const totalCells = gridSize * gridSize;
   const needed = includeFreeSpace ? totalCells - 1 : totalCells;
   const ready = options.length >= needed;
 
   const handleGenerateCard = async () => {
+    if (creating) return;
+    setCreating(true);
     sendGTMEvent({
       event: "generate_card",
       theme: THEMES[themeKey].themeName,
     });
-    const encoded = await encodeCard({
-      includeFreeSpace,
-      themeKey,
-      gridSize,
-      options,
-    });
-    router.push(`/c/${encoded}`);
+    const card = { includeFreeSpace, themeKey, gridSize, options };
+
+    let fallbackReason: string;
+    try {
+      const res = await fetch("/api/cards", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(card),
+        signal: AbortSignal.timeout(CREATE_TIMEOUT_MS),
+      });
+      if (res.ok) {
+        const { id } = await res.json();
+        router.push(`/s/${id}`);
+        return;
+      }
+      fallbackReason = res.status === 429 ? "rate_limited" : `http_${res.status}`;
+    } catch (err) {
+      fallbackReason =
+        err instanceof DOMException && err.name === "TimeoutError"
+          ? "timeout"
+          : "network";
+    }
+
+    // Short links are an extra: if saving fails, the card still works as a long link
+    sendGTMEvent({ event: "card_link_fallback", reason: fallbackReason });
+    router.push(`/c/${await encodeCard(card)}`);
   };
 
   return (
@@ -116,10 +140,16 @@ const CardMaker = () => {
                 variant="primary"
                 size="lg"
                 className="w-full"
-                disabled={!ready}
+                disabled={!ready || creating}
                 onClick={handleGenerateCard}
               >
-                Create my card <ArrowRightIcon />
+                {creating ? (
+                  "Creating…"
+                ) : (
+                  <>
+                    Create my card <ArrowRightIcon />
+                  </>
+                )}
               </Button>
               {!ready && (
                 <p className="mt-3 text-center text-sm text-mist-500">
