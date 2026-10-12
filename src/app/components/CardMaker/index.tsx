@@ -14,7 +14,7 @@ import Toggle from "../ui/Toggle";
 import Wordmark from "../ui/Wordmark";
 import { ArrowRightIcon } from "../ui/icons";
 import { useConsent } from "../CookieConsent";
-import { THEMES, type ThemeKey } from "../../lib/constants";
+import { KOFI_URL, THEMES, type ThemeKey } from "../../lib/constants";
 import { encodeCard } from "../../utils/url-helpers";
 
 const CREATE_TIMEOUT_MS = 5000;
@@ -170,13 +170,24 @@ const CardMaker = () => {
         <p>
           Fan-made and not affiliated with Nintendo, Sony or Microsoft.
         </p>
-        <button
-          type="button"
-          onClick={openCookieSettings}
-          className="cursor-pointer underline-offset-4 hover:text-mist-300 hover:underline"
-        >
-          Cookie settings
-        </button>
+        <div className="flex items-center gap-4">
+          <a
+            href={KOFI_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => sendGTMEvent({ event: "support_click" })}
+            className="underline-offset-4 hover:text-mist-300 hover:underline"
+          >
+            Support on Ko-fi
+          </a>
+          <button
+            type="button"
+            onClick={openCookieSettings}
+            className="cursor-pointer underline-offset-4 hover:text-mist-300 hover:underline"
+          >
+            Cookie settings
+          </button>
+        </div>
       </footer>
     </div>
   );

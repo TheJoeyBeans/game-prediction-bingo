@@ -93,4 +93,4 @@ Free Supabase projects pause after about a week without activity. The daily clea
 
 ### Analytics
 
-Google Tag Manager loads only after a visitor accepts cookies. Custom events (`generate_card`, `share_card`, `card_link_fallback`, `card_not_found`, `card_load_error`, `stream_mode_toggle`, `shuffle_board`) are pushed to the `dataLayer`. Each needs a matching trigger and GA4 event tag in the Tag Manager container to show up in Google Analytics.
+Google Tag Manager loads only after a visitor accepts cookies. Custom events (`generate_card`, `share_card`, `card_link_fallback`, `card_not_found`, `card_load_error`, `stream_mode_toggle`, `shuffle_board`, `support_click`) are pushed to the `dataLayer`. Each needs a matching trigger and GA4 event tag in the Tag Manager container to show up in Google Analytics.
