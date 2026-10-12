@@ -1,5 +1,8 @@
 export const SITE_URL = "https://videogamebingo.com";
 
+// Anonymous cards are deleted after this many days without a visit
+export const ANON_CARD_TTL_DAYS = 7;
+
 export const THEMES = {
   classicBingo: {
     themeName: "Classic Bingo",
