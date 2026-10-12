@@ -46,20 +46,39 @@ const BingoCard = ({ card }: { card: CardState }) => {
   }, [shareStatus]);
 
   const handleShuffleBoard = () => {
+    sendGTMEvent({ event: "shuffle_board" });
     setSelected(new Set());
     setOptions(shuffleBoard([...options]));
   };
 
+  const handleStreamModeChange = (enabled: boolean) => {
+    sendGTMEvent({ event: "stream_mode_toggle", enabled });
+    setStreamMode(enabled);
+  };
+
   const handleShareClick = async () => {
-    sendGTMEvent({ event: "share_card" });
     const url = window.location.href;
+    // Long links mean the short link couldn't be saved when the card was made
+    const trackShare = (method: "native" | "copy", outcome: string) =>
+      sendGTMEvent({
+        event: "share_card",
+        method,
+        outcome,
+        link_type: window.location.pathname.startsWith("/s/") ? "short" : "long",
+      });
 
     // Phones and tablets get the native share sheet; desktops copy the link
     if (navigator.share && window.matchMedia("(pointer: coarse)").matches) {
       try {
         await navigator.share({ title: "My video game bingo card", url });
-      } catch {
-        // Share sheet dismissed
+        trackShare("native", "shared");
+      } catch (err) {
+        trackShare(
+          "native",
+          err instanceof DOMException && err.name === "AbortError"
+            ? "dismissed"
+            : "failed"
+        );
       }
       return;
     }
@@ -67,8 +86,10 @@ const BingoCard = ({ card }: { card: CardState }) => {
     try {
       await navigator.clipboard.writeText(url);
       setShareStatus("copied");
+      trackShare("copy", "copied");
     } catch {
       setShareStatus("failed");
+      trackShare("copy", "failed");
     }
   };
 
@@ -129,7 +150,7 @@ const BingoCard = ({ card }: { card: CardState }) => {
             label="Stream mode"
             labelClassName={streamMode ? "sr-only" : "sr-only sm:not-sr-only"}
             checked={streamMode}
-            onChange={setStreamMode}
+            onChange={handleStreamModeChange}
           />
         </div>
       </header>

@@ -7,7 +7,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import Script from "next/script";
 import { GoogleTagManager } from "@next/third-parties/google";
 import Button from "../ui/Button";
 import {
@@ -19,14 +18,12 @@ import {
 } from "../../lib/consent";
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
-const ADSENSE_SRC =
-  "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9515363363004095";
 
 const ConsentContext = createContext({ openCookieSettings: () => {} });
 
 export const useConsent = () => useContext(ConsentContext);
 
-// Google Tag Manager and AdSense load only after the visitor accepts
+// Google Tag Manager loads only after the visitor accepts
 const CookieConsent = ({ children }: { children: ReactNode }) => {
   const [choice, setChoice] = useState<ConsentChoice | null>(null);
   const [bannerOpen, setBannerOpen] = useState(false);
@@ -59,12 +56,7 @@ const CookieConsent = ({ children }: { children: ReactNode }) => {
     >
       {children}
 
-      {choice === "accepted" && (
-        <>
-          {GTM_ID && <GoogleTagManager gtmId={GTM_ID} />}
-          <Script src={ADSENSE_SRC} crossOrigin="anonymous" />
-        </>
-      )}
+      {choice === "accepted" && GTM_ID && <GoogleTagManager gtmId={GTM_ID} />}
 
       {bannerOpen && (
         <div
@@ -73,9 +65,9 @@ const CookieConsent = ({ children }: { children: ReactNode }) => {
           className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-50 rounded-2xl bg-ink-800/95 p-4 shadow-2xl ring-1 ring-white/10 backdrop-blur sm:inset-x-auto sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:p-5"
         >
           <p className="mb-4 text-sm text-mist-300">
-            We&apos;d like to use cookies for analytics and to show personalized
-            ads. Nothing loads unless you accept, and you can change your choice
-            anytime from &ldquo;Cookie settings&rdquo; on the home page.
+            We&apos;d like to use cookies for analytics. Nothing loads unless
+            you accept, and you can change your choice anytime from &ldquo;Cookie
+            settings&rdquo; on the home page.
           </p>
           <div className="flex gap-2">
             {/* Equal weight for both choices; the current one is highlighted when reopened */}

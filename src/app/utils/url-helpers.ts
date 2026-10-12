@@ -43,7 +43,7 @@ const pipe = async (
     ).arrayBuffer()
   );
 
-const toCardState = (
+export const toCardState = (
   gridSize: unknown,
   options: unknown,
   includeFreeSpace: unknown,
