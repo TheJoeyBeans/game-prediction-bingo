@@ -42,6 +42,9 @@ const CardMaker = () => {
     sendGTMEvent({
       event: "generate_card",
       theme: THEMES[themeKey].themeName,
+      grid_size: gridSize,
+      free_space: includeFreeSpace,
+      option_count: options.length,
     });
     const card = { includeFreeSpace, themeKey, gridSize, options };
 

@@ -16,10 +16,13 @@ const consentSignals = (granted: boolean) => ({
   analytics_storage: granted ? "granted" : "denied",
 });
 
-// Runs before any Google tag so Consent Mode starts as "denied" everywhere
-export const CONSENT_DEFAULTS_SCRIPT = `window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments);};gtag('consent','default',${JSON.stringify(
-  consentSignals(false)
-)});`;
+// Runs before any Google tag. Starts denied, or granted for a visitor who already accepted,
+// so events fired as a page loads count under the visitor's saved choice
+export const CONSENT_DEFAULTS_SCRIPT = `window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments);};(function(){var accepted=false;try{accepted=localStorage.getItem(${JSON.stringify(
+  STORAGE_KEY
+)})==="accepted";}catch(e){}gtag('consent','default',accepted?${JSON.stringify(
+  consentSignals(true)
+)}:${JSON.stringify(consentSignals(false))});})();`;
 
 export const grantGoogleConsent = () => {
   window.gtag?.("consent", "update", consentSignals(true));
