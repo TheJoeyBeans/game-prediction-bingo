@@ -54,7 +54,7 @@ VIEW
     1. Reject IDs that don't match /^[0-9A-Za-z]{8}$/   → 404 page
     2. getCard(id), wrapped in the Next data cache (1 h, tag card:<id>)
          cache miss → SELECT payload, disabled FROM cards
-    3. Missing, disabled, or invalid payload            → "This card has expired" page (404)
+    3. Missing, disabled, or invalid payload            → "We couldn't find this card" page (404)
     4. Render <BingoCard card={…} />
     5. after(): touchCard(id), at most one rpc touch_card per card per day per instance
 
@@ -239,7 +239,7 @@ from public, anon, authenticated;
 
 - **Partial unique index instead of a plain unique index on `content_hash`.** Dedup applies only between anonymous cards. When user profiles arrive, owned cards get their own index (section 11), so an anonymous card and a user's card with the same content never resolve to each other.
 - **Two people creating the same card at the same moment is handled.** If two identical inserts race, the second one's `on conflict do nothing` waits for the first to commit. Its `update` then finds the committed row, so both get the same ID.
-- **`payload` as `jsonb`, validated again on read.** The read path runs the stored payload through `toCardState()` too. If the card shape ever changes, a bad or outdated row shows the "expired" page instead of crashing the page.
+- **`payload` as `jsonb`, validated again on read.** The read path runs the stored payload through `toCardState()` too. If the card shape ever changes, a bad or outdated row shows the not-found page instead of crashing the page.
 - **`owner_id` column now, foreign key later.** Adding the column now means the cleanup query and indexes are already correct for user profiles. The foreign key needs the profiles table, so it waits.
 - **Rate limits in Postgres.** Creates are rare compared with reads, so a counter row per IP per window costs nothing noticeable and needs no extra service. The limits are passed in as parameters, so tuning them is a code change, not a migration.
 
@@ -329,7 +329,7 @@ for (let attempt = 0; attempt < 3; attempt++) {
 throw new Error("Could not allocate a card ID");
 ```
 
-A duplicate of a **disabled** card returns the disabled ID. That's intentional: re-creating a card that was taken down still shows the "expired" page.
+A duplicate of a **disabled** card returns the disabled ID. That's intentional: re-creating a card that was taken down still shows the not-found page.
 
 **`getCard(id)`**, wrapped in the data cache:
 
@@ -466,13 +466,13 @@ Use the same metadata as the `/c/` page, so cards stay out of search results.
 
 ### 11.2 `src/app/s/[id]/not-found.tsx` (new)
 
-"This card has expired or doesn't exist", with a "Make a new card" button linking to `/`. Use the existing `Backdrop`, `Wordmark` and `Button` components so it matches the rest of the site.
+"We couldn't find this card", explaining that it may have been removed after a period of inactivity or the link may be mistyped, with a "Make a new card" button linking to `/`. The wording stays generic so it doesn't reveal how cards are stored or removed. Use the existing `Backdrop`, `Wordmark` and `Button` components so it matches the rest of the site.
 
 The same page is shown for missing, expired and disabled cards, so the page never reveals that a card was taken down.
 
 ### 11.3 `src/app/s/[id]/error.tsx` (new)
 
-If Supabase can't be reached (an outage or a paused project), `getCard` throws. This page says "We couldn't load this card right now, try again in a minute" and has a retry button. It's kept separate from the expired page so an outage never tells viewers their card is gone.
+If Supabase can't be reached (an outage or a paused project), `getCard` throws. This page says "We couldn't load this card right now, try again in a minute" and has a retry button. It's kept separate from the not-found page so an outage never tells viewers their card is gone.
 
 ### 11.4 Existing routes
 
@@ -604,7 +604,7 @@ Each step can be its own commit, and steps 2–9 can be one PR.
 | 3 | Install `@supabase/supabase-js` | `package.json`, `package-lock.json` | Claude, after your approval of the exact version |
 | 4 | Server library: Supabase client, IDs and hashing, cards, rate limiting. Export `toCardState`. Add `ANON_CARD_TTL_DAYS` | `src/app/lib/server/*`, `src/app/utils/url-helpers.ts`, `src/app/lib/constants.ts` | Claude |
 | 5 | `POST /api/cards` | `src/app/api/cards/route.ts` | Claude |
-| 6 | Short card page, expired page, error page | `src/app/s/[id]/page.tsx`, `not-found.tsx`, `error.tsx` | Claude |
+| 6 | Short card page, not-found page, error page | `src/app/s/[id]/page.tsx`, `not-found.tsx`, `error.tsx` | Claude |
 | 7 | CardMaker: create through the API, with fallback and loading state | `src/app/components/CardMaker/index.tsx` | Claude |
 | 8 | Cleanup cron | `src/app/api/cron/cleanup/route.ts`, `vercel.json` | Claude |
 | 9 | Update the README: setup, environment variables, migration, moderation | `README.md` | Claude |
@@ -636,9 +636,9 @@ The repo has no test framework, and adding one is out of scope (it would be anot
 **View**
 
 - [ ] The share button and the address bar both show the short URL.
-- [ ] `/s/bad`, `/s/!!!!!!!!`, and an unknown valid-format ID all show the expired page with a 404 status.
-- [ ] With Supabase unreachable and the cache empty, `/s/<id>` shows the error page, not the expired page.
-- [ ] A card disabled in SQL shows the expired page within an hour.
+- [ ] `/s/bad`, `/s/!!!!!!!!`, and an unknown valid-format ID all show the not-found page with a 404 status.
+- [ ] With Supabase unreachable and the cache empty, `/s/<id>` shows the error page, not the not-found page.
+- [ ] A card disabled in SQL shows the not-found page within an hour.
 - [ ] Viewing a card older than a day updates `last_accessed_at` (check in SQL). Viewing it again right away does not.
 - [ ] Old `/c/...` and `/?s=...` links still work.
 
