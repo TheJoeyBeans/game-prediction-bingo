@@ -8,15 +8,13 @@ declare global {
 
 const STORAGE_KEY = "consent-choice";
 
-const consentSignals = (granted: boolean) => {
-  const value = granted ? "granted" : "denied";
-  return {
-    ad_storage: value,
-    ad_user_data: value,
-    ad_personalization: value,
-    analytics_storage: value,
-  };
-};
+// The site shows no ads, so ad signals stay denied even after the visitor accepts
+const consentSignals = (granted: boolean) => ({
+  ad_storage: "denied",
+  ad_user_data: "denied",
+  ad_personalization: "denied",
+  analytics_storage: granted ? "granted" : "denied",
+});
 
 // Runs before any Google tag so Consent Mode starts as "denied" everywhere
 export const CONSENT_DEFAULTS_SCRIPT = `window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments);};gtag('consent','default',${JSON.stringify(
@@ -45,7 +43,7 @@ export const saveChoice = (choice: ConsentChoice) => {
   }
 };
 
-const GOOGLE_COOKIE = /^(_ga|_gid|_gat|_gcl|__gads|__gpi|__eoi|FCNEC)/;
+const GOOGLE_COOKIE = /^(_ga|_gid|_gat)/;
 
 // Remove first-party Google cookies when consent is withdrawn
 export const clearGoogleCookies = () => {
