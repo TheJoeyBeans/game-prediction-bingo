@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import CardMaker from "./components/CardMaker";
+import EventLinks from "./components/EventLinks";
 import JsonLd from "./components/JsonLd";
 import { SITE_URL } from "./lib/constants";
 
@@ -24,7 +25,20 @@ export default function BingoHome() {
   return (
     <>
       <JsonLd data={structuredData} />
-      <CardMaker />
+      <CardMaker>
+        <section className="mt-16 sm:mt-24">
+          <h2 className="font-display text-2xl font-bold tracking-tight text-mist-100 sm:text-3xl">
+            Bingo for every showcase
+          </h2>
+          <p className="mt-3 max-w-2xl text-mist-300">
+            Each showcase has its own card maker with starter predictions, so
+            you can have a card ready before the stream starts.
+          </p>
+          <div className="mt-6">
+            <EventLinks />
+          </div>
+        </section>
+      </CardMaker>
     </>
   );
 }
