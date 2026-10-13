@@ -84,3 +84,8 @@ the human-readable rationale is in `docs/AI_GOVERNANCE.md`.
 - Report what actually happened: failed commands, skipped steps, and blocked actions.
 - When a rule here prevents a task, say which rule and offer the developer the command
   to run themselves.
+
+ ## 10. Project context
+
+Read @docs/project-context.md before starting work. It covers the product, decisions already made,
+how this developer likes to work, and the tools and git workflow for this repo.
