@@ -26,6 +26,8 @@ interface BoardProps {
   fitViewport?: boolean;
   // Card maker preview only: pick or drag squares to swap their predictions
   swap?: Pick<Swap, "picked" | "drag" | "pick" | "startDrag">;
+  // Easier on the eyes: neutral squares with the theme's color on borders and marks, and no glow
+  soft?: boolean;
 }
 
 const Board = ({
@@ -37,8 +39,27 @@ const Board = ({
   onCellClick,
   fitViewport = false,
   swap,
+  soft = false,
 }: BoardProps) => {
   const theme = THEMES[themeKey];
+  // Soft colors use the site's surface and text colors, so they follow light and dark mode
+  const colors = soft
+    ? {
+        board: "var(--color-ink-800)",
+        cell: "var(--color-ink-900)",
+        cellHover: "var(--color-ink-700)",
+        text: "var(--color-mist-100)",
+        border: theme.accentColor,
+        marker: theme.accentColor,
+      }
+    : {
+        board: theme.shadowColor,
+        cell: theme.backgroundColor,
+        cellHover: theme.hoverColor,
+        text: theme.textColor,
+        border: theme.borderColor,
+        marker: theme.markerColor,
+      };
   const totalCells = gridSize * gridSize;
   const maxWidth = `${gridSize * MAX_CELL_REM}rem`;
 
@@ -49,8 +70,8 @@ const Board = ({
         maxWidth: fitViewport
           ? `min(${maxWidth}, max(18rem, calc(100dvh - 15rem)))`
           : maxWidth,
-        backgroundColor: theme.shadowColor,
-        boxShadow: `0 0 80px -20px ${theme.accentColor}`,
+        backgroundColor: colors.board,
+        boxShadow: soft ? "none" : `0 0 56px -28px ${theme.accentColor}`,
       }}
     >
       <div
@@ -58,8 +79,8 @@ const Board = ({
         style={
           {
             gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
-            "--cell-bg": theme.backgroundColor,
-            "--cell-hover": theme.hoverColor,
+            "--cell-bg": colors.cell,
+            "--cell-hover": colors.cellHover,
           } as CSSProperties
         }
       >
@@ -106,8 +127,8 @@ const Board = ({
                   : ""
               } ${isDragSource ? "opacity-40" : ""}`}
               style={{
-                color: theme.textColor,
-                border: `1px solid ${theme.borderColor}`,
+                color: colors.text,
+                border: `1px solid ${colors.border}`,
               }}
             >
               <span className="absolute inset-0 flex items-center justify-center p-[6cqi] text-center">
@@ -122,9 +143,9 @@ const Board = ({
                 <span
                   className="pointer-events-none absolute inset-[12%] rounded-full animate-daub motion-reduce:animate-none"
                   style={{
-                    border: `5cqi solid ${theme.markerColor}`,
-                    backgroundColor: `color-mix(in srgb, ${theme.markerColor} 28%, transparent)`,
-                    boxShadow: `0 0 6cqi color-mix(in srgb, ${theme.markerColor} 40%, transparent)`,
+                    border: `5cqi solid ${colors.marker}`,
+                    backgroundColor: `color-mix(in srgb, ${colors.marker} 28%, transparent)`,
+                    boxShadow: `0 0 6cqi color-mix(in srgb, ${colors.marker} 40%, transparent)`,
                   }}
                 />
               )}

@@ -7,6 +7,7 @@ import { sendGTMEvent } from "@next/third-parties/google";
 import Board from "../Board";
 import Backdrop from "../ui/Backdrop";
 import Button, { buttonStyles } from "../ui/Button";
+import DisplayMenu from "../ui/DisplayMenu";
 import Toggle from "../ui/Toggle";
 import Wordmark from "../ui/Wordmark";
 import {
@@ -16,6 +17,7 @@ import {
   ShuffleIcon,
 } from "../ui/icons";
 import { THEMES } from "../../lib/constants";
+import { readPreference, savePreference } from "../../lib/preferences";
 import { themedButtonStyle } from "../../lib/themeStyles";
 import { PLATFORM_LOGOS } from "../../utils/logos";
 import {
@@ -33,9 +35,12 @@ const SHARE_LABELS = {
   failed: "Couldn't copy. Use the address bar link.",
 };
 
+const SOFT_COLORS_KEY = "soft-colors";
+
 const BingoCard = ({ card }: { card: CardState }) => {
   const { gridSize, includeFreeSpace, themeKey } = card;
   const [streamMode, setStreamMode] = useState(false);
+  const [softColors, setSoftColors] = useState(false);
   const [selected, setSelected] = useState(() => new Set<number>());
   const [options, setOptions] = useState(card.options);
   const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "failed">(
@@ -45,6 +50,11 @@ const BingoCard = ({ card }: { card: CardState }) => {
   const platformLogo = PLATFORM_LOGOS[themeKey];
   // Hidden controls keep their space so the board doesn't jump in stream mode
   const controlsVisibility = streamMode ? "invisible" : "";
+
+  // Read after mounting, since the server can't know this browser's preference
+  useEffect(() => {
+    setSoftColors(readPreference(SOFT_COLORS_KEY) === "on");
+  }, []);
 
   useEffect(() => {
     if (shareStatus === "idle") return;
@@ -91,6 +101,12 @@ const BingoCard = ({ card }: { card: CardState }) => {
   const handleStreamModeChange = (enabled: boolean) => {
     sendGTMEvent({ event: "stream_mode_toggle", enabled });
     setStreamMode(enabled);
+  };
+
+  const handleSoftColorsChange = (enabled: boolean) => {
+    sendGTMEvent({ event: "soft_colors_toggle", enabled });
+    setSoftColors(enabled);
+    savePreference(SOFT_COLORS_KEY, enabled ? "on" : null);
   };
 
   const handleShareClick = async () => {
@@ -144,7 +160,7 @@ const BingoCard = ({ card }: { card: CardState }) => {
       className="relative flex min-h-dvh flex-col"
       style={{ "--event": theme.accentColor } as CSSProperties}
     >
-      <Backdrop />
+      <Backdrop glow={!softColors} />
 
       {/* Side columns share the leftover space, so the logo stays centered and never overlaps the controls */}
       <header className="grid grid-cols-[1fr_minmax(0,28rem)_1fr] items-center gap-3 p-3 sm:p-5">
@@ -191,17 +207,26 @@ const BingoCard = ({ card }: { card: CardState }) => {
               : ""
           }`}
         >
-          <Toggle
-            label="Stream mode"
-            labelClassName={streamMode ? "sr-only" : "sr-only sm:not-sr-only"}
-            checked={streamMode}
-            onChange={handleStreamModeChange}
-          />
+          <DisplayMenu>
+            <Toggle
+              label="Stream mode"
+              className="flex w-full justify-between"
+              checked={streamMode}
+              onChange={handleStreamModeChange}
+            />
+            <Toggle
+              label="Soft colors"
+              className="flex w-full justify-between"
+              checked={softColors}
+              onChange={handleSoftColorsChange}
+            />
+          </DisplayMenu>
         </div>
       </header>
 
       <main className="flex flex-1 items-center justify-center px-3 py-2 sm:px-6">
         <Board
+          soft={softColors}
           gridSize={gridSize}
           options={options}
           includeFreeSpace={includeFreeSpace}
