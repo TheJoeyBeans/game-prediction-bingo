@@ -14,7 +14,7 @@ Built with Next.js 15 (App Router) and Tailwind CSS, hosted on Vercel, with card
 
 2. **Create a Supabase project** for development at [supabase.com](https://supabase.com) (the free plan is fine; pick the East US region to sit next to Vercel's default region). Keep "Enable Data API" on.
 
-3. **Run the migration.** In the project's SQL editor, paste and run [`supabase/migrations/001_cards.sql`](supabase/migrations/001_cards.sql).
+3. **Run the migrations.** In the project's SQL editor, paste and run each file in [`supabase/migrations/`](supabase/migrations/) in order (`001_cards.sql`, then `002_event_dates.sql`).
 
 4. **Configure environment variables.** Copy `.env.example` to `.env.local` and fill it in (see below).
 
@@ -82,6 +82,10 @@ curl -H "Authorization: Bearer $CRON_SECRET" https://videogamebingo.com/api/cron
 ```
 
 It responds with how many rows were deleted, e.g. `{"cards":3,"rate_limits":120}`.
+
+### Keeping cards for a scheduled show
+
+When a show's date is announced, add it to that event in `src/app/lib/events.ts`, e.g. `eventDate: "2026-12-10"`, and deploy. Until a week after that date, cards in the event's theme aren't deleted for inactivity, so people can make a card weeks ahead and share it closer to the show. After that the normal 7-day rule applies. Change or remove the date the same way if the show moves or once it's over.
 
 ### If Supabase pauses the project
 

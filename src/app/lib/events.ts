@@ -25,6 +25,9 @@ export interface ShowcaseEvent {
   faq: EventFaq[];
   // Bump when the page's content changes; feeds the sitemap
   updated: string;
+  // Date of the next show (YYYY-MM-DD) when it's announced. Until a week after it, cards in
+  // this event's theme aren't deleted for inactivity, so they can be made well ahead
+  eventDate?: string;
 }
 
 export const EVENTS: ShowcaseEvent[] = [
@@ -335,3 +338,12 @@ export const getEvent = (slug: string) =>
 
 export const getEventForTheme = (themeKey: ThemeKey) =>
   EVENTS.find((event) => event.themeKey === themeKey);
+
+// Announced show dates by theme, for the daily cleanup
+export const scheduledEventDates = () =>
+  Object.fromEntries(
+    EVENTS.filter((event) => event.eventDate).map((event) => [
+      event.themeKey,
+      event.eventDate,
+    ])
+  );
