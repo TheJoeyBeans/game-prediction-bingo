@@ -13,6 +13,8 @@ export const THEMES = {
     hoverColor: "#f0f0f0", // Light gray for hover effect
     shadowColor: "#999999", // Shadow color for depth
     accentColor: "#7c5cff", // Glow behind the page and board
+    markerColor: "#7c5cff", // Marks on played squares; purple dauber on white
+    accentTextColor: "#ffffff", // Text on accent-colored buttons
   },
   nintendoDirect: {
     themeName: "Nintendo Direct",
@@ -22,6 +24,8 @@ export const THEMES = {
     hoverColor: "#cc000f",
     shadowColor: "#99000b",
     accentColor: "#ff1f3d",
+    markerColor: "#ffffff",
+    accentTextColor: "#ffffff",
   },
   playstationStateOfPlay: {
     themeName: "PlayStation State of Play",
@@ -31,6 +35,8 @@ export const THEMES = {
     hoverColor: "#002766",
     shadowColor: "#001233",
     accentColor: "#2f7bff",
+    markerColor: "#ffffff",
+    accentTextColor: "#ffffff",
   },
   xbox: {
     themeName: "Xbox Games Showcase",
@@ -40,15 +46,19 @@ export const THEMES = {
     hoverColor: "#0c6b0c",
     shadowColor: "#083f08",
     accentColor: "#22c55e",
+    markerColor: "#b5f23d", // Lime stands out on Xbox green
+    accentTextColor: "#052e12",
   },
   gameAwards: {
-    themeName: "Game Awards",
-    backgroundColor: "#1a1a1a", // Dark, classy background
-    textColor: "#00d4ff", // Neon blue (from their branding)
-    borderColor: "#003b4d",
-    hoverColor: "#006b89",
-    shadowColor: "#00000099",
-    accentColor: "#00d4ff",
+    themeName: "The Game Awards",
+    backgroundColor: "#141210", // Near-black, like the show's branding
+    textColor: "#e8c49a", // Gold from the logo
+    borderColor: "#4a3a28",
+    hoverColor: "#211c17",
+    shadowColor: "#050505",
+    accentColor: "#d9a56b",
+    markerColor: "#e8c49a",
+    accentTextColor: "#1a1208",
   },
   summerGameFest: {
     themeName: "Summer Game Fest",
@@ -58,51 +68,19 @@ export const THEMES = {
     hoverColor: "#452980",
     shadowColor: "#1c1038",
     accentColor: "#ff6bd6",
+    markerColor: "#ff6bd6",
+    accentTextColor: "#2a0b26",
   },
 };
 
 export type ThemeKey = keyof typeof THEMES;
 export type Theme = (typeof THEMES)[ThemeKey];
 
-// Themes offered in the card maker (Game Awards and Summer Game Fest aren't ready yet)
+// Themes offered in the card maker (Summer Game Fest isn't ready yet)
 export const PICKER_THEMES: ThemeKey[] = [
   "classicBingo",
   "nintendoDirect",
   "playstationStateOfPlay",
   "xbox",
-];
-
-export const KEYWORDS = [
-  "Nintendo Direct Bingo Card",
-  "Nintendo Direct Bingo",
-  "Nintendo Direct Bingo Card Maker",
-  "Nintendo Direct Prediction Bingo",
-  "Nintendo Direct Prediction Bingo Card",
-  "Nintendo Direct Prediction Bingo Card Maker",
-  "PlayStation State of Play Bingo Card",
-  "PlayStation State of Play Bingo",
-  "PlayStation State of Play Bingo Card Maker",
-  "PlayStation State of Play Prediction Bingo",
-  "PlayStation State of Play Prediction Bingo Card",
-  "PlayStation State of Play Prediction Bingo Card Maker",
-  "Xbox Games Showcase Bingo Card",
-  "Xbox Games Showcase Bingo",
-  "Xbox Games Showcase Bingo Card Maker",
-  "Xbox Games Showcase Prediction Bingo",
-  "Xbox Games Showcase Prediction Bingo Card",
-  "Xbox Games Showcase Prediction Bingo Card Maker",
-  "Video Game Conference Bingo",
-  "Video Game Conference Bingo Card",
-  "Video Game Conference Bingo Card Maker",
-  "Video Game Conference Prediction Bingo",
-  "Video Game Conference Prediction Bingo Card",
-  "Video Game Conference Prediction Bingo Card Maker",
-  "Video Game Prediction Bingo",
-  "Video Game Prediction Bingo Card",
-  "Video Game Prediction Bingo Card Maker",
-  "Video Game Bingo Card",
-  "Video Game Bingo",
-  "Video Game Bingo Card Maker",
-  "Prediction Bingo Game",
-  "Game Conference Bingo",
+  "gameAwards",
 ];

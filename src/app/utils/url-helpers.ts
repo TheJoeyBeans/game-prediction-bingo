@@ -17,9 +17,15 @@ const THEME_KEYS = Object.keys(THEMES) as ThemeKey[];
 const isThemeKey = (value: unknown): value is ThemeKey =>
   THEME_KEYS.includes(value as ThemeKey);
 
+// Themes renamed since older links were made
+const FORMER_THEME_NAMES: Record<string, ThemeKey> = {
+  "Game Awards": "gameAwards",
+};
+
 // Older links stored the whole theme object, so match it back by name
 const themeKeyFromName = (name: unknown) =>
-  THEME_KEYS.find((key) => THEMES[key].themeName === name);
+  THEME_KEYS.find((key) => THEMES[key].themeName === name) ??
+  (typeof name === "string" ? FORMER_THEME_NAMES[name] : undefined);
 
 const toBase64Url = (bytes: Uint8Array) =>
   btoa(Array.from(bytes, (byte) => String.fromCharCode(byte)).join(""))

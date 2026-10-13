@@ -8,7 +8,7 @@ interface ThemePickerProps {
 }
 
 const ThemePicker = ({ selected, onChange }: ThemePickerProps) => (
-  <div className="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
+  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
     {PICKER_THEMES.map((key) => {
       const theme = THEMES[key];
       const active = selected === key;
@@ -22,8 +22,8 @@ const ThemePicker = ({ selected, onChange }: ThemePickerProps) => (
           style={{ "--swatch": theme.accentColor } as CSSProperties}
           className={`relative flex cursor-pointer flex-col items-start gap-3 rounded-xl p-3 text-left transition duration-150 ${
             active
-              ? "bg-white/[0.07] ring-2 ring-(--swatch) shadow-[0_0_24px_-8px_var(--swatch)]"
-              : "ring-1 ring-inset ring-white/10 hover:bg-white/[0.04] hover:ring-white/20"
+              ? "bg-veil/[0.07] ring-2 ring-(--swatch) shadow-[0_0_24px_-8px_var(--swatch)]"
+              : "ring-1 ring-inset ring-veil/10 hover:bg-veil/[0.04] hover:ring-veil/20"
           }`}
         >
           {/* A tiny card in the theme's colors */}

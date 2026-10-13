@@ -14,7 +14,7 @@ Built with Next.js 15 (App Router) and Tailwind CSS, hosted on Vercel, with card
 
 2. **Create a Supabase project** for development at [supabase.com](https://supabase.com) (the free plan is fine; pick the East US region to sit next to Vercel's default region). Keep "Enable Data API" on.
 
-3. **Run the migration.** In the project's SQL editor, paste and run [`supabase/migrations/001_cards.sql`](supabase/migrations/001_cards.sql).
+3. **Run the migrations.** In the project's SQL editor, paste and run each file in [`supabase/migrations/`](supabase/migrations/) in order (`001_cards.sql`, then `002_event_dates.sql`).
 
 4. **Configure environment variables.** Copy `.env.example` to `.env.local` and fill it in (see below).
 
@@ -83,6 +83,10 @@ curl -H "Authorization: Bearer $CRON_SECRET" https://videogamebingo.com/api/cron
 
 It responds with how many rows were deleted, e.g. `{"cards":3,"rate_limits":120}`.
 
+### Keeping cards for a scheduled show
+
+When a show's date is announced, add it to that event in `src/app/lib/events.ts`, e.g. `eventDate: "2026-12-10"`, and deploy. Until a week after that date, cards in the event's theme aren't deleted for inactivity, so people can make a card weeks ahead and share it closer to the show. After that the normal 7-day rule applies. Change or remove the date the same way if the show moves or once it's over.
+
 ### If Supabase pauses the project
 
 Free Supabase projects pause after about a week without activity. The daily cleanup should keep it active, but if it does pause:
@@ -93,4 +97,4 @@ Free Supabase projects pause after about a week without activity. The daily clea
 
 ### Analytics
 
-Google Tag Manager loads only after a visitor accepts cookies. Custom events (`generate_card`, `share_card`, `card_link_fallback`, `card_not_found`, `card_load_error`, `stream_mode_toggle`, `shuffle_board`, `support_click`) are pushed to the `dataLayer`. Each needs a matching trigger and GA4 event tag in the Tag Manager container to show up in Google Analytics.
+Google Tag Manager loads only after a visitor accepts cookies. Custom events (`generate_card`, `share_card`, `card_link_fallback`, `card_not_found`, `card_load_error`, `stream_mode_toggle`, `shuffle_board`, `support_click`, `use_starter_predictions`, `soft_colors_toggle`, `color_mode_change`, `bingo`) are pushed to the `dataLayer`. Each needs a matching trigger and GA4 event tag in the Tag Manager container to show up in Google Analytics.

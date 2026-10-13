@@ -1,20 +1,24 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { sendGTMEvent } from "@next/third-parties/google";
 import PreviewBoard from "./PreviewBoard";
 import Options from "./Options";
 import ThemePicker from "./ThemePicker";
 import StepPanel from "./StepPanel";
+import { useSwap } from "./useSwap";
 import Backdrop from "../ui/Backdrop";
 import Button from "../ui/Button";
+import ColorModeButton from "../ui/ColorModeButton";
 import SegmentedControl from "../ui/SegmentedControl";
 import Toggle from "../ui/Toggle";
 import Wordmark from "../ui/Wordmark";
 import { ArrowRightIcon } from "../ui/icons";
 import { useConsent } from "../CookieConsent";
 import { KOFI_URL, THEMES, type ThemeKey } from "../../lib/constants";
+import { themedButtonStyle } from "../../lib/themeStyles";
 import { encodeCard } from "../../utils/url-helpers";
 
 const CREATE_TIMEOUT_MS = 5000;
@@ -24,14 +28,42 @@ const GRID_SIZES = [3, 5, 7].map((size) => ({
   label: `${size} × ${size}`,
 }));
 
-const CardMaker = () => {
+interface CardMakerProps {
+  heading?: string;
+  intro?: string;
+  initialThemeKey?: ThemeKey;
+  // Event landing pages offer ready-made predictions for their show
+  starter?: { eventName: string; predictions: string[] };
+  // Page content shown below the card maker
+  children?: ReactNode;
+}
+
+const CardMaker = ({
+  heading = "Prediction bingo for every showcase",
+  intro = "Make a bingo card for Nintendo Direct, PlayStation State of Play, Xbox Games Showcase and more. Share it with friends and mark off your predictions as the show plays out live.",
+  initialThemeKey = "classicBingo",
+  starter,
+  children,
+}: CardMakerProps) => {
   const router = useRouter();
   const { openCookieSettings } = useConsent();
   const [includeFreeSpace, setIncludeFreeSpace] = useState(true);
-  const [themeKey, setThemeKey] = useState<ThemeKey>("classicBingo");
+  const [themeKey, setThemeKey] = useState<ThemeKey>(initialThemeKey);
   const [gridSize, setGridSize] = useState(5);
   const [options, setOptions] = useState<string[]>([]);
   const [creating, setCreating] = useState(false);
+  const swap = useSwap(options.length, (a, b) =>
+    setOptions((current) => {
+      const next = [...current];
+      [next[a], next[b]] = [next[b], next[a]];
+      return next;
+    })
+  );
+  // Any other change shifts positions, so a pending pick no longer points where it did
+  const updateOptions = (next: string[]) => {
+    swap.cancel();
+    setOptions(next);
+  };
   const totalCells = gridSize * gridSize;
   const needed = includeFreeSpace ? totalCells - 1 : totalCells;
   const ready = options.length >= needed;
@@ -81,19 +113,20 @@ const CardMaker = () => {
     >
       <Backdrop />
 
-      <header className="mx-auto flex w-full max-w-7xl items-center px-4 py-5 sm:px-6 lg:px-8">
-        <Wordmark className="text-lg" />
+      <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
+        <Link href="/" aria-label="Video Game Bingo home">
+          <Wordmark className="text-lg" />
+        </Link>
+        <ColorModeButton />
       </header>
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 sm:px-6 lg:px-8">
         <section className="max-w-3xl py-6 sm:py-10">
-          <h1 className="bg-linear-to-br from-white to-mist-300 bg-clip-text font-display text-[clamp(2.25rem,4vw+1rem,4rem)] leading-[1.05] font-bold tracking-tight text-transparent">
-            Prediction bingo for every showcase
+          <h1 className="bg-linear-to-br from-mist-100 to-mist-300 bg-clip-text font-display text-[clamp(2.25rem,4vw+1rem,4rem)] leading-[1.05] font-bold tracking-tight text-transparent">
+            {heading}
           </h1>
           <p className="mt-4 max-w-2xl text-base text-mist-300 sm:text-lg">
-            Make a bingo card for Nintendo Direct, PlayStation State of Play,
-            Xbox Games Showcase and more. Share it with friends and mark off
-            your predictions as the show plays out live.
+            {intro}
           </p>
         </section>
 
@@ -128,7 +161,13 @@ const CardMaker = () => {
                 </span>
               }
             >
-              <Options options={options} setOptions={setOptions} needed={needed} />
+              <Options
+                options={options}
+                setOptions={updateOptions}
+                needed={needed}
+                starter={starter}
+                swap={swap}
+              />
             </StepPanel>
           </div>
 
@@ -138,6 +177,7 @@ const CardMaker = () => {
               options={options}
               includeFreeSpace={includeFreeSpace}
               themeKey={themeKey}
+              swap={swap}
             >
               <Button
                 variant="primary"
@@ -145,6 +185,11 @@ const CardMaker = () => {
                 className="w-full"
                 disabled={!ready || creating}
                 onClick={handleGenerateCard}
+                style={
+                  ready && !creating
+                    ? themedButtonStyle(THEMES[themeKey])
+                    : undefined
+                }
               >
                 {creating ? (
                   "Creating…"
@@ -164,11 +209,13 @@ const CardMaker = () => {
             </PreviewBoard>
           </div>
         </div>
+
+        {children}
       </main>
 
       <footer className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-mist-500 sm:flex-row sm:px-6 lg:px-8">
         <p>
-          Fan-made and not affiliated with Nintendo, Sony or Microsoft.
+          Fan-made and not affiliated with Nintendo, Sony, Microsoft or The Game Awards.
         </p>
         <div className="flex items-center gap-4">
           <a
@@ -189,6 +236,16 @@ const CardMaker = () => {
           </button>
         </div>
       </footer>
+
+      {swap.drag && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed z-50 max-w-60 truncate rounded-lg bg-ink-700 px-3 py-1.5 text-sm text-mist-100 shadow-xl ring-1 ring-veil/20"
+          style={{ left: swap.drag.x + 14, top: swap.drag.y + 14 }}
+        >
+          {options[swap.drag.from]}
+        </div>
+      )}
     </div>
   );
 };

@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "clean": "rm -rf .next",
+    "rebuild": "npm run clean && npm run build"
   },
   "dependencies": {
     "@next/third-parties": "15.5.27",

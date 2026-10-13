@@ -3,6 +3,7 @@ interface ToggleProps {
   onChange: (checked: boolean) => void;
   label: string;
   labelClassName?: string;
+  className?: string;
 }
 
 const Toggle = ({
@@ -10,8 +11,11 @@ const Toggle = ({
   onChange,
   label,
   labelClassName = "",
+  className = "",
 }: ToggleProps) => (
-  <label className="inline-flex cursor-pointer items-center gap-3 select-none">
+  <label
+    className={`inline-flex cursor-pointer items-center gap-3 select-none ${className}`}
+  >
     <span className={`text-sm font-medium text-mist-300 ${labelClassName}`}>
       {label}
     </span>

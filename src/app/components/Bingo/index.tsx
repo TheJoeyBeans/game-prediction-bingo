@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { sendGTMEvent } from "@next/third-parties/google";
 import Board from "../Board";
+import Confetti from "../Confetti";
 import Backdrop from "../ui/Backdrop";
 import Button, { buttonStyles } from "../ui/Button";
+import DisplayMenu from "../ui/DisplayMenu";
 import Toggle from "../ui/Toggle";
 import Wordmark from "../ui/Wordmark";
 import {
@@ -16,7 +24,17 @@ import {
   ShuffleIcon,
 } from "../ui/icons";
 import { THEMES } from "../../lib/constants";
+import { useColorMode } from "../../lib/colorMode";
+import { readPreference, savePreference } from "../../lib/preferences";
+import { themedButtonStyle } from "../../lib/themeStyles";
 import { PLATFORM_LOGOS } from "../../utils/logos";
+import {
+  boardSlots,
+  cellToOption,
+  completedLines,
+  isFreeCell,
+  optionToCell,
+} from "../../utils/boardLayout";
 import { shuffleBoard } from "../../utils/shuffleBoard";
 import type { CardState } from "../../utils/url-helpers";
 
@@ -26,9 +44,13 @@ const SHARE_LABELS = {
   failed: "Couldn't copy. Use the address bar link.",
 };
 
+const SOFT_COLORS_KEY = "soft-colors";
+
 const BingoCard = ({ card }: { card: CardState }) => {
   const { gridSize, includeFreeSpace, themeKey } = card;
   const [streamMode, setStreamMode] = useState(false);
+  const [softColors, setSoftColors] = useState(false);
+  const [colorMode, changeColorMode] = useColorMode();
   const [selected, setSelected] = useState(() => new Set<number>());
   const [options, setOptions] = useState(card.options);
   const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "failed">(
@@ -36,8 +58,28 @@ const BingoCard = ({ card }: { card: CardState }) => {
   );
   const theme = THEMES[themeKey];
   const platformLogo = PLATFORM_LOGOS[themeKey];
+  const bingoLines = useMemo(
+    () => completedLines(gridSize, includeFreeSpace, selected),
+    [gridSize, includeFreeSpace, selected]
+  );
+  const [confettiBurst, setConfettiBurst] = useState(0);
+  // Lines already celebrated, so only a newly completed line sets off confetti
+  const celebratedLines = useRef(0);
   // Hidden controls keep their space so the board doesn't jump in stream mode
   const controlsVisibility = streamMode ? "invisible" : "";
+
+  useEffect(() => {
+    if (bingoLines.length > celebratedLines.current) {
+      sendGTMEvent({ event: "bingo", lines: bingoLines.length });
+      setConfettiBurst((burst) => burst + 1);
+    }
+    celebratedLines.current = bingoLines.length;
+  }, [bingoLines.length]);
+
+  // Read after mounting, since the server can't know this browser's preference
+  useEffect(() => {
+    setSoftColors(readPreference(SOFT_COLORS_KEY) === "on");
+  }, []);
 
   useEffect(() => {
     if (shareStatus === "idle") return;
@@ -45,15 +87,57 @@ const BingoCard = ({ card }: { card: CardState }) => {
     return () => clearTimeout(timer);
   }, [shareStatus]);
 
+  // Marks stay with their predictions, and marked predictions stay on the board,
+  // so only unmarked ones trade places with the extras
   const handleShuffleBoard = () => {
     sendGTMEvent({ event: "shuffle_board" });
-    setSelected(new Set());
-    setOptions(shuffleBoard([...options]));
+    const slots = boardSlots(gridSize, includeFreeSpace);
+    const markedOptions = [...selected]
+      .filter((cell) => !isFreeCell(cell, gridSize, includeFreeSpace))
+      .map((cell) => cellToOption(cell, gridSize, includeFreeSpace));
+    const unmarked = shuffleBoard(
+      options.map((_, i) => i).filter((i) => !markedOptions.includes(i))
+    );
+    const unmarkedOnBoard = slots - markedOptions.length;
+    // New order, as indexes into the old order
+    const order = [
+      ...shuffleBoard([...markedOptions, ...unmarked.slice(0, unmarkedOnBoard)]),
+      ...unmarked.slice(unmarkedOnBoard),
+    ];
+    const newCell = new Map(
+      order.map((oldOption, position) => [
+        oldOption,
+        optionToCell(position, gridSize, includeFreeSpace),
+      ])
+    );
+
+    const nextSelected = new Set(
+      [...selected].map((cell) =>
+        isFreeCell(cell, gridSize, includeFreeSpace)
+          ? cell
+          : newCell.get(cellToOption(cell, gridSize, includeFreeSpace))!
+      )
+    );
+    // A shuffle can line marks up by chance; that shouldn't count as a new bingo
+    celebratedLines.current = completedLines(
+      gridSize,
+      includeFreeSpace,
+      nextSelected
+    ).length;
+
+    setOptions(order.map((i) => options[i]));
+    setSelected(nextSelected);
   };
 
   const handleStreamModeChange = (enabled: boolean) => {
     sendGTMEvent({ event: "stream_mode_toggle", enabled });
     setStreamMode(enabled);
+  };
+
+  const handleSoftColorsChange = (enabled: boolean) => {
+    sendGTMEvent({ event: "soft_colors_toggle", enabled });
+    setSoftColors(enabled);
+    savePreference(SOFT_COLORS_KEY, enabled ? "on" : null);
   };
 
   const handleShareClick = async () => {
@@ -107,7 +191,7 @@ const BingoCard = ({ card }: { card: CardState }) => {
       className="relative flex min-h-dvh flex-col"
       style={{ "--event": theme.accentColor } as CSSProperties}
     >
-      <Backdrop />
+      <Backdrop glow={!softColors} />
 
       {/* Side columns share the leftover space, so the logo stays centered and never overlaps the controls */}
       <header className="grid grid-cols-[1fr_minmax(0,28rem)_1fr] items-center gap-3 p-3 sm:p-5">
@@ -126,12 +210,20 @@ const BingoCard = ({ card }: { card: CardState }) => {
 
         <div className="flex justify-center">
           {platformLogo ? (
-            <div className="max-w-full rounded-xl bg-white px-4 py-2 shadow-lg sm:px-6">
+            <div
+              className={`max-w-full overflow-hidden rounded-xl shadow-lg ${
+                platformLogo.hasBackground ? "" : "bg-white px-4 py-2 sm:px-6"
+              }`}
+            >
               <Image
-                src={platformLogo}
+                src={platformLogo.image}
                 alt={`${theme.themeName} logo`}
                 width={700}
-                className="h-auto max-h-9 w-auto max-w-full sm:max-h-12 lg:max-h-14"
+                className={`h-auto w-auto max-w-full ${
+                  platformLogo.hasBackground
+                    ? "max-h-15 sm:max-h-18 lg:max-h-20"
+                    : "max-h-9 sm:max-h-12 lg:max-h-14"
+                }`}
               />
             </div>
           ) : (
@@ -146,17 +238,33 @@ const BingoCard = ({ card }: { card: CardState }) => {
               : ""
           }`}
         >
-          <Toggle
-            label="Stream mode"
-            labelClassName={streamMode ? "sr-only" : "sr-only sm:not-sr-only"}
-            checked={streamMode}
-            onChange={handleStreamModeChange}
-          />
+          <DisplayMenu>
+            <Toggle
+              label="Stream mode"
+              className="flex w-full justify-between"
+              checked={streamMode}
+              onChange={handleStreamModeChange}
+            />
+            <Toggle
+              label="Soft colors"
+              className="flex w-full justify-between"
+              checked={softColors}
+              onChange={handleSoftColorsChange}
+            />
+            <Toggle
+              label="Light mode"
+              className="flex w-full justify-between"
+              checked={colorMode === "light"}
+              onChange={(light) => changeColorMode(light ? "light" : "dark")}
+            />
+          </DisplayMenu>
         </div>
       </header>
 
       <main className="flex flex-1 items-center justify-center px-3 py-2 sm:px-6">
         <Board
+          soft={softColors}
+          bingoLines={bingoLines}
           gridSize={gridSize}
           options={options}
           includeFreeSpace={includeFreeSpace}
@@ -174,11 +282,26 @@ const BingoCard = ({ card }: { card: CardState }) => {
           onClick={handleShareClick}
           aria-live="polite"
           className={controlsVisibility}
+          style={themedButtonStyle(theme)}
         >
           {shareStatus === "copied" ? <CheckIcon /> : <ShareIcon />}
           {SHARE_LABELS[shareStatus]}
         </Button>
       </footer>
+
+      <Confetti
+        burst={confettiBurst}
+        colors={[
+          theme.accentColor,
+          theme.markerColor,
+          theme.textColor,
+          theme.backgroundColor,
+        ]}
+      />
+      <p className="sr-only" aria-live="polite">
+        {bingoLines.length > 0 &&
+          `Bingo! ${bingoLines.length} ${bingoLines.length === 1 ? "line" : "lines"} complete.`}
+      </p>
     </div>
   );
 };

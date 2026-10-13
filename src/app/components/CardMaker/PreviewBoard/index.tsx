@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import Board from "../../Board";
 import StepPanel from "../StepPanel";
 import { THEMES, type ThemeKey } from "../../../lib/constants";
@@ -8,6 +8,7 @@ interface PreviewBoardProps {
   options: string[];
   includeFreeSpace: boolean;
   themeKey: ThemeKey;
+  swap?: ComponentProps<typeof Board>["swap"];
   children?: ReactNode;
 }
 
@@ -15,7 +16,7 @@ const PreviewBoard = ({ children, ...boardProps }: PreviewBoardProps) => (
   <StepPanel
     title="Live preview"
     aside={
-      <span className="rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-mist-300 ring-1 ring-inset ring-white/10">
+      <span className="rounded-full bg-veil/5 px-3 py-1 text-xs font-medium text-mist-300 ring-1 ring-inset ring-veil/10">
         {THEMES[boardProps.themeKey].themeName}
       </span>
     }

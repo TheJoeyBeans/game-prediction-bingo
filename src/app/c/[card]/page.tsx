@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import BingoCard from "../../components/Bingo";
+import { cardMetadata } from "../../lib/cardMetadata";
 import { decodeCard } from "../../utils/url-helpers";
 
-// Each card is a variation of the home page, so keep them out of search results
-export const metadata: Metadata = {
-  title: "Bingo Card | Video Game Prediction Bingo",
-  robots: { index: false, follow: true },
-};
+// Link preview with the card's event
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ card: string }>;
+}): Promise<Metadata> {
+  const { card: encoded } = await params;
+  return cardMetadata(await decodeCard(encoded), `/c/${encoded}`);
+}
 
 export default async function CardPage({
   params,

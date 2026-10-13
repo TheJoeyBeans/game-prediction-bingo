@@ -62,7 +62,7 @@ const CookieConsent = ({ children }: { children: ReactNode }) => {
         <div
           role="dialog"
           aria-label="Cookie consent"
-          className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-50 rounded-2xl bg-ink-800/95 p-4 shadow-2xl ring-1 ring-white/10 backdrop-blur sm:inset-x-auto sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:p-5"
+          className="fixed inset-x-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-50 rounded-2xl bg-ink-800/95 p-4 shadow-2xl ring-1 ring-veil/10 backdrop-blur sm:inset-x-auto sm:left-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:p-5"
         >
           <p className="mb-4 text-sm text-mist-300">
             We&apos;d like to use cookies for analytics. Nothing loads unless
