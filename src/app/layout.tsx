@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import CookieConsent from "./components/CookieConsent";
-import { KEYWORDS, SITE_URL } from "./lib/constants";
+import { SITE_URL } from "./lib/constants";
 import { CONSENT_DEFAULTS_SCRIPT } from "./lib/consent";
 import "./globals.css";
 
@@ -17,11 +17,12 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Video Game Prediction Bingo",
+  title: {
+    default: "Video Game Prediction Bingo",
+    template: "%s | Video Game Bingo",
+  },
   description:
     "Create prediction bingo cards for video game conferences like Nintendo Direct, PlayStation State of Play, and Xbox Games Showcase. Make your own video game bingo card now!",
-  keywords: KEYWORDS,
-  alternates: { canonical: "/" },
   robots: { index: true, follow: true },
   icons: { icon: "/favicon.ico" },
   openGraph: {
@@ -30,20 +31,9 @@ export const metadata: Metadata = {
       "Create and play prediction bingo for video game events like Nintendo Direct, PlayStation State of Play, and Xbox Games Showcase.",
     url: SITE_URL,
     siteName: "Video Game Prediction Bingo",
-    // TODO: replace with a 1200x630 share image
-    images: [{ url: "/favicon.ico", alt: "Game Prediction Bingo Logo" }],
     type: "website",
   },
-};
-
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: "Video Game Prediction Bingo",
-  url: SITE_URL,
-  description:
-    "Play bingo with predictions for video game events like Nintendo Direct, State of Play, and Xbox Games Showcase.",
-  keywords: KEYWORDS,
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({
@@ -55,10 +45,6 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${grotesk.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: CONSENT_DEFAULTS_SCRIPT }} />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-        />
       </head>
       <body>
         <CookieConsent>{children}</CookieConsent>

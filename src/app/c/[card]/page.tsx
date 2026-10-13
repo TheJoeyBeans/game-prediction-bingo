@@ -5,7 +5,7 @@ import { decodeCard } from "../../utils/url-helpers";
 
 // Each card is a variation of the home page, so keep them out of search results
 export const metadata: Metadata = {
-  title: "Bingo Card | Video Game Prediction Bingo",
+  title: "Bingo Card",
   robots: { index: false, follow: true },
 };
 

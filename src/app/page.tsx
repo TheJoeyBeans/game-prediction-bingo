@@ -1,19 +1,30 @@
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import CardMaker from "./components/CardMaker";
-import { decodeLegacyCard, encodeCard } from "./utils/url-helpers";
+import JsonLd from "./components/JsonLd";
+import { SITE_URL } from "./lib/constants";
 
-export default async function BingoHome({
-  searchParams,
-}: {
-  searchParams: Promise<{ s?: string | string[] }>;
-}) {
-  const { s } = await searchParams;
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
-  // Send links shared before /c/ existed to the new, shorter format
-  const legacyCard = typeof s === "string" ? decodeLegacyCard(s) : null;
-  if (legacyCard) {
-    redirect(`/c/${await encodeCard(legacyCard)}`);
-  }
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Video Game Prediction Bingo",
+  url: SITE_URL,
+  description:
+    "Play bingo with predictions for video game events like Nintendo Direct, State of Play, and Xbox Games Showcase.",
+  applicationCategory: "GameApplication",
+  operatingSystem: "Any",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+};
 
-  return <CardMaker />;
+// Static, so it's served instantly; links from before /c/ existed are redirected by next.config.ts
+export default function BingoHome() {
+  return (
+    <>
+      <JsonLd data={structuredData} />
+      <CardMaker />
+    </>
+  );
 }
