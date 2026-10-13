@@ -36,7 +36,6 @@ const Board = ({
   const theme = THEMES[themeKey];
   const totalCells = gridSize * gridSize;
   const centerIndex = Math.floor((totalCells - 1) / 2);
-  const markerBackground = themeKey === "classicBingo" ? "bg-black" : "bg-white";
   const maxWidth = `${gridSize * MAX_CELL_REM}rem`;
   const Cell = onCellClick ? "button" : "div";
 
@@ -94,8 +93,14 @@ const Board = ({
                 </span>
               </span>
               {isSelected && (
+                // A dauber stamp: a ring in the theme's marker color with a light tint, so the text stays readable
                 <span
-                  className={`pointer-events-none absolute inset-[18%] rounded-full ${markerBackground} opacity-85 animate-daub motion-reduce:animate-none`}
+                  className="pointer-events-none absolute inset-[12%] rounded-full animate-daub motion-reduce:animate-none"
+                  style={{
+                    border: `5cqi solid ${theme.markerColor}`,
+                    backgroundColor: `color-mix(in srgb, ${theme.markerColor} 28%, transparent)`,
+                    boxShadow: `0 0 6cqi color-mix(in srgb, ${theme.markerColor} 40%, transparent)`,
+                  }}
                 />
               )}
             </Cell>

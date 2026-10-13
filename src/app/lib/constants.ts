@@ -13,6 +13,8 @@ export const THEMES = {
     hoverColor: "#f0f0f0", // Light gray for hover effect
     shadowColor: "#999999", // Shadow color for depth
     accentColor: "#7c5cff", // Glow behind the page and board
+    markerColor: "#7c5cff", // Marks on played squares; purple dauber on white
+    accentTextColor: "#ffffff", // Text on accent-colored buttons
   },
   nintendoDirect: {
     themeName: "Nintendo Direct",
@@ -22,6 +24,8 @@ export const THEMES = {
     hoverColor: "#cc000f",
     shadowColor: "#99000b",
     accentColor: "#ff1f3d",
+    markerColor: "#ffffff",
+    accentTextColor: "#ffffff",
   },
   playstationStateOfPlay: {
     themeName: "PlayStation State of Play",
@@ -31,6 +35,8 @@ export const THEMES = {
     hoverColor: "#002766",
     shadowColor: "#001233",
     accentColor: "#2f7bff",
+    markerColor: "#ffffff",
+    accentTextColor: "#ffffff",
   },
   xbox: {
     themeName: "Xbox Games Showcase",
@@ -40,6 +46,8 @@ export const THEMES = {
     hoverColor: "#0c6b0c",
     shadowColor: "#083f08",
     accentColor: "#22c55e",
+    markerColor: "#b5f23d", // Lime stands out on Xbox green
+    accentTextColor: "#052e12",
   },
   gameAwards: {
     themeName: "The Game Awards",
@@ -49,6 +57,8 @@ export const THEMES = {
     hoverColor: "#211c17",
     shadowColor: "#050505",
     accentColor: "#d9a56b",
+    markerColor: "#e8c49a",
+    accentTextColor: "#1a1208",
   },
   summerGameFest: {
     themeName: "Summer Game Fest",
@@ -58,6 +68,8 @@ export const THEMES = {
     hoverColor: "#452980",
     shadowColor: "#1c1038",
     accentColor: "#ff6bd6",
+    markerColor: "#ff6bd6",
+    accentTextColor: "#2a0b26",
   },
 };
 

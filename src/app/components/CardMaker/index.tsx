@@ -16,6 +16,7 @@ import Wordmark from "../ui/Wordmark";
 import { ArrowRightIcon } from "../ui/icons";
 import { useConsent } from "../CookieConsent";
 import { KOFI_URL, THEMES, type ThemeKey } from "../../lib/constants";
+import { themedButtonStyle } from "../../lib/themeStyles";
 import { encodeCard } from "../../utils/url-helpers";
 
 const CREATE_TIMEOUT_MS = 5000;
@@ -167,6 +168,11 @@ const CardMaker = ({
                 className="w-full"
                 disabled={!ready || creating}
                 onClick={handleGenerateCard}
+                style={
+                  ready && !creating
+                    ? themedButtonStyle(THEMES[themeKey])
+                    : undefined
+                }
               >
                 {creating ? (
                   "Creating…"

@@ -16,6 +16,7 @@ import {
   ShuffleIcon,
 } from "../ui/icons";
 import { THEMES } from "../../lib/constants";
+import { themedButtonStyle } from "../../lib/themeStyles";
 import { PLATFORM_LOGOS } from "../../utils/logos";
 import { shuffleBoard } from "../../utils/shuffleBoard";
 import type { CardState } from "../../utils/url-helpers";
@@ -182,6 +183,7 @@ const BingoCard = ({ card }: { card: CardState }) => {
           onClick={handleShareClick}
           aria-live="polite"
           className={controlsVisibility}
+          style={themedButtonStyle(theme)}
         >
           {shareStatus === "copied" ? <CheckIcon /> : <ShareIcon />}
           {SHARE_LABELS[shareStatus]}
