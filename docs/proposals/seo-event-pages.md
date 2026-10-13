@@ -181,3 +181,12 @@ Each step ends with a check we do together, like before.
 2. **Starter predictions:** I'll draft ~30 per event for you to edit. Do you want to write any yourself?
 3. **Home page heading:** keep "Prediction bingo for every showcase", or make it more searchable, such as "Video Game Bingo Card Maker"?
 4. **Order after this phase:** I'd do The Game Awards board first, because it's in December. Then Summer Game Fest and Gamescom ONL before next summer.
+
+## 13. Implementation notes
+
+Changes from the plan above, made while building:
+
+- **No `ready` flag.** An event joins `EVENTS` in `src/app/lib/events.ts` only once its theme and copy are finished, and that alone adds its page, sitemap entry, share image and links. Summer Game Fest and Gamescom ONL get entries when their boards are made.
+- **No footer links.** The home page has a "Bingo for every showcase" section and each event page has "More showcase bingo", so every page already links to every event page. The footer stays short.
+- **New analytics event:** `use_starter_predictions` (parameter `theme`, the event's name). It needs adding to the "Site events" trigger in Tag Manager.
+- **Site-wide 404 page** (`src/app/not-found.tsx`), because unknown top-level paths now return 404 through the event route.
