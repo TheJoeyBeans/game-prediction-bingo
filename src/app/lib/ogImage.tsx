@@ -7,6 +7,7 @@ export const OG_SIZE = { width: 1200, height: 630 };
 const GRID = 5;
 const CELL = 62;
 const GAP = 10;
+const BOARD_PADDING = 14;
 // A diagonal bingo plus a few stray marks
 const MARKED = new Set([0, 6, 12, 18, 24, 3, 9, 15, 21]);
 
@@ -74,8 +75,9 @@ export const renderOgImage = ({
           style={{
             display: "flex",
             flexWrap: "wrap",
-            width: GRID * (CELL + GAP),
-            padding: 14,
+            // Padding counts toward the width here, so add it or the last square wraps
+            width: GRID * (CELL + GAP) + BOARD_PADDING * 2,
+            padding: BOARD_PADDING,
             borderRadius: 24,
             backgroundColor: theme.shadowColor,
           }}
