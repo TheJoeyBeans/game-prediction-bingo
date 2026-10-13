@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import Board from "../../Board";
 import StepPanel from "../StepPanel";
 import { THEMES, type ThemeKey } from "../../../lib/constants";
@@ -8,6 +8,7 @@ interface PreviewBoardProps {
   options: string[];
   includeFreeSpace: boolean;
   themeKey: ThemeKey;
+  swap?: ComponentProps<typeof Board>["swap"];
   children?: ReactNode;
 }
 

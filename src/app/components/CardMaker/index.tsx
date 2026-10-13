@@ -8,6 +8,7 @@ import PreviewBoard from "./PreviewBoard";
 import Options from "./Options";
 import ThemePicker from "./ThemePicker";
 import StepPanel from "./StepPanel";
+import { useSwap } from "./useSwap";
 import Backdrop from "../ui/Backdrop";
 import Button from "../ui/Button";
 import SegmentedControl from "../ui/SegmentedControl";
@@ -50,6 +51,18 @@ const CardMaker = ({
   const [gridSize, setGridSize] = useState(5);
   const [options, setOptions] = useState<string[]>([]);
   const [creating, setCreating] = useState(false);
+  const swap = useSwap(options.length, (a, b) =>
+    setOptions((current) => {
+      const next = [...current];
+      [next[a], next[b]] = [next[b], next[a]];
+      return next;
+    })
+  );
+  // Any other change shifts positions, so a pending pick no longer points where it did
+  const updateOptions = (next: string[]) => {
+    swap.cancel();
+    setOptions(next);
+  };
   const totalCells = gridSize * gridSize;
   const needed = includeFreeSpace ? totalCells - 1 : totalCells;
   const ready = options.length >= needed;
@@ -148,9 +161,10 @@ const CardMaker = ({
             >
               <Options
                 options={options}
-                setOptions={setOptions}
+                setOptions={updateOptions}
                 needed={needed}
                 starter={starter}
+                swap={swap}
               />
             </StepPanel>
           </div>
@@ -161,6 +175,7 @@ const CardMaker = ({
               options={options}
               includeFreeSpace={includeFreeSpace}
               themeKey={themeKey}
+              swap={swap}
             >
               <Button
                 variant="primary"
@@ -219,6 +234,16 @@ const CardMaker = ({
           </button>
         </div>
       </footer>
+
+      {swap.drag && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed z-50 max-w-60 truncate rounded-lg bg-ink-700 px-3 py-1.5 text-sm text-mist-100 shadow-xl ring-1 ring-white/20"
+          style={{ left: swap.drag.x + 14, top: swap.drag.y + 14 }}
+        >
+          {options[swap.drag.from]}
+        </div>
+      )}
     </div>
   );
 };

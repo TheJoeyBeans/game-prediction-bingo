@@ -59,3 +59,9 @@ export const ShareIcon = (props: SVGProps<SVGSVGElement>) => (
     <path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" />
   </Icon>
 );
+
+export const EditIcon = (props: SVGProps<SVGSVGElement>) => (
+  <Icon {...props}>
+    <path d="M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4" />
+  </Icon>
+);

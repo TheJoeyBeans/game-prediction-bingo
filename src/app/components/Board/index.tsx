@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { THEMES, type ThemeKey } from "../../lib/constants";
+import type { Swap } from "../CardMaker/useSwap";
 
 // Largest a cell gets; below that the board shrinks to fit its container
 const MAX_CELL_REM = 7;
@@ -22,6 +23,8 @@ interface BoardProps {
   onCellClick?: (index: number) => void;
   // Also cap the board by screen height, minus room for the surrounding UI
   fitViewport?: boolean;
+  // Card maker preview only: pick or drag squares to swap their predictions
+  swap?: Pick<Swap, "picked" | "drag" | "pick" | "startDrag">;
 }
 
 const Board = ({
@@ -32,12 +35,12 @@ const Board = ({
   selected,
   onCellClick,
   fitViewport = false,
+  swap,
 }: BoardProps) => {
   const theme = THEMES[themeKey];
   const totalCells = gridSize * gridSize;
   const centerIndex = Math.floor((totalCells - 1) / 2);
   const maxWidth = `${gridSize * MAX_CELL_REM}rem`;
-  const Cell = onCellClick ? "button" : "div";
 
   return (
     <div
@@ -66,6 +69,13 @@ const Board = ({
             includeFreeSpace && index > centerIndex ? index - 1 : index;
           const text = isFreeSpace ? "Free Space" : options[optionIndex] || "";
           const isSelected = selected?.has(index) ?? false;
+          const swappable =
+            swap !== undefined && !isFreeSpace && optionIndex < options.length;
+          const isPicked = swappable && swap?.picked === optionIndex;
+          const isDragSource = swappable && swap?.drag?.from === optionIndex;
+          const isDropTarget =
+            swappable && !isDragSource && swap?.drag?.over === optionIndex;
+          const Cell = onCellClick || swappable ? "button" : "div";
 
           return (
             <Cell
@@ -75,11 +85,27 @@ const Board = ({
                 "aria-pressed": isSelected,
                 onClick: () => onCellClick(index),
               })}
+              {...(swap &&
+                swappable && {
+                  type: "button" as const,
+                  "aria-pressed": isPicked,
+                  "data-swap-index": optionIndex,
+                  onClick: () => swap.pick(optionIndex),
+                  onPointerDown: swap.startDrag(optionIndex),
+                })}
               className={`@container relative aspect-square overflow-hidden rounded-lg bg-(--cell-bg) font-semibold ${
                 onCellClick
                   ? "cursor-pointer transition-transform duration-100 hover:bg-(--cell-hover) active:scale-95"
                   : ""
-              }`}
+              } ${
+                swappable
+                  ? "cursor-grab transition duration-100 select-none hover:bg-(--cell-hover)"
+                  : ""
+              } ${isPicked ? "z-10 scale-95 outline-3 outline-offset-2 outline-white" : ""} ${
+                isDropTarget
+                  ? "z-10 outline-2 outline-offset-2 outline-white/80 outline-dashed"
+                  : ""
+              } ${isDragSource ? "opacity-40" : ""}`}
               style={{
                 color: theme.textColor,
                 border: `1px solid ${theme.borderColor}`,
