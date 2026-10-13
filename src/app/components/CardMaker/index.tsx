@@ -215,7 +215,7 @@ const CardMaker = ({
 
       <footer className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-mist-500 sm:flex-row sm:px-6 lg:px-8">
         <p>
-          Fan-made and not affiliated with Nintendo, Sony or Microsoft.
+          Fan-made and not affiliated with Nintendo, Sony, Microsoft or The Game Awards.
         </p>
         <div className="flex items-center gap-4">
           <a
