@@ -1,4 +1,5 @@
 import { useState, type ClipboardEvent, type FormEvent } from "react";
+import { sendGTMEvent } from "@next/third-parties/google";
 import Button from "../../ui/Button";
 import { CloseIcon, PlusIcon, ShuffleIcon } from "../../ui/icons";
 import { shuffleBoard } from "../../../utils/shuffleBoard";
@@ -8,12 +9,23 @@ interface OptionsProps {
   options: string[];
   setOptions: (options: string[]) => void;
   needed: number;
+  starter?: { eventName: string; predictions: string[] };
 }
 
-const Options = ({ options, setOptions, needed }: OptionsProps) => {
+const Options = ({ options, setOptions, needed, starter }: OptionsProps) => {
   const [inputValue, setInputValue] = useState("");
   const count = options.length;
   const extra = count - needed;
+  // Starter predictions not on the card yet, so the offer disappears once they're all added
+  const missingStarter =
+    starter?.predictions.filter((prediction) => !options.includes(prediction)) ??
+    [];
+
+  const handleUseStarter = () => {
+    if (!starter) return;
+    sendGTMEvent({ event: "use_starter_predictions", theme: starter.eventName });
+    setOptions([...options, ...missingStarter]);
+  };
 
   const addOptions = (values: string[]) => {
     const cleaned = values.map((value) => value.trim()).filter(Boolean);
@@ -47,6 +59,24 @@ const Options = ({ options, setOptions, needed }: OptionsProps) => {
 
   return (
     <div className="space-y-4">
+      {starter && missingStarter.length > 0 && (
+        <div className="flex flex-col gap-3 rounded-xl bg-white/[0.04] p-3 ring-1 ring-inset ring-white/10 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-mist-300">
+            {count === 0
+              ? `Short on time? Start with ${missingStarter.length} ${starter.eventName} predictions and edit from there.`
+              : `Add ${missingStarter.length} more ${starter.eventName} predictions from our list.`}
+          </p>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="shrink-0"
+            onClick={handleUseStarter}
+          >
+            {count === 0 ? "Use these predictions" : "Add them"}
+          </Button>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="flex gap-2">
         <label htmlFor="new-option" className="sr-only">
           New prediction

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { sendGTMEvent } from "@next/third-parties/google";
 import PreviewBoard from "./PreviewBoard";
@@ -24,11 +25,27 @@ const GRID_SIZES = [3, 5, 7].map((size) => ({
   label: `${size} × ${size}`,
 }));
 
-const CardMaker = () => {
+interface CardMakerProps {
+  heading?: string;
+  intro?: string;
+  initialThemeKey?: ThemeKey;
+  // Event landing pages offer ready-made predictions for their show
+  starter?: { eventName: string; predictions: string[] };
+  // Page content shown below the card maker
+  children?: ReactNode;
+}
+
+const CardMaker = ({
+  heading = "Prediction bingo for every showcase",
+  intro = "Make a bingo card for Nintendo Direct, PlayStation State of Play, Xbox Games Showcase and more. Share it with friends and mark off your predictions as the show plays out live.",
+  initialThemeKey = "classicBingo",
+  starter,
+  children,
+}: CardMakerProps) => {
   const router = useRouter();
   const { openCookieSettings } = useConsent();
   const [includeFreeSpace, setIncludeFreeSpace] = useState(true);
-  const [themeKey, setThemeKey] = useState<ThemeKey>("classicBingo");
+  const [themeKey, setThemeKey] = useState<ThemeKey>(initialThemeKey);
   const [gridSize, setGridSize] = useState(5);
   const [options, setOptions] = useState<string[]>([]);
   const [creating, setCreating] = useState(false);
@@ -82,18 +99,18 @@ const CardMaker = () => {
       <Backdrop />
 
       <header className="mx-auto flex w-full max-w-7xl items-center px-4 py-5 sm:px-6 lg:px-8">
-        <Wordmark className="text-lg" />
+        <Link href="/" aria-label="Video Game Bingo home">
+          <Wordmark className="text-lg" />
+        </Link>
       </header>
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 sm:px-6 lg:px-8">
         <section className="max-w-3xl py-6 sm:py-10">
           <h1 className="bg-linear-to-br from-white to-mist-300 bg-clip-text font-display text-[clamp(2.25rem,4vw+1rem,4rem)] leading-[1.05] font-bold tracking-tight text-transparent">
-            Prediction bingo for every showcase
+            {heading}
           </h1>
           <p className="mt-4 max-w-2xl text-base text-mist-300 sm:text-lg">
-            Make a bingo card for Nintendo Direct, PlayStation State of Play,
-            Xbox Games Showcase and more. Share it with friends and mark off
-            your predictions as the show plays out live.
+            {intro}
           </p>
         </section>
 
@@ -128,7 +145,12 @@ const CardMaker = () => {
                 </span>
               }
             >
-              <Options options={options} setOptions={setOptions} needed={needed} />
+              <Options
+                options={options}
+                setOptions={setOptions}
+                needed={needed}
+                starter={starter}
+              />
             </StepPanel>
           </div>
 
@@ -164,6 +186,8 @@ const CardMaker = () => {
             </PreviewBoard>
           </div>
         </div>
+
+        {children}
       </main>
 
       <footer className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-mist-500 sm:flex-row sm:px-6 lg:px-8">
