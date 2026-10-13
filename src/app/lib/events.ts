@@ -330,6 +330,7 @@ export const EVENTS: ShowcaseEvent[] = [
       },
     ],
     updated: "2026-10-13",
+    eventDate: "2026-12-10",
   },
 ];
 
