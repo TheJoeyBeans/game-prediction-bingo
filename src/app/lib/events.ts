@@ -253,6 +253,81 @@ export const EVENTS: ShowcaseEvent[] = [
     ],
     updated: "2026-10-13",
   },
+  {
+    slug: "game-awards-bingo",
+    themeKey: "gameAwards",
+    name: "The Game Awards",
+    title: "The Game Awards Bingo Card Maker",
+    description:
+      "Make a free Game Awards bingo card in seconds. Use our predictions or your own, share it with friends, chat, whoever, and play along live.",
+    heading: "The Game Awards Bingo Card Maker",
+    intro:
+      "Fill a card with your Game Awards predictions, from winners to world premieres, or start from ours. Share it with friends, chat, whoever, and play along live.",
+    starterPredictions: [
+      "Favorite wins Game of the Year",
+      "Surprise Game of the Year winner",
+      "World premiere trailer",
+      "Hideo Kojima appears",
+      "Orchestra plays a medley",
+      "Winner gets played off mid-speech",
+      "Celebrity from film or TV presents",
+      "Shadow drop during the show",
+      "Sequel announced for a nominee",
+      "Indie wins a major category",
+      "Remake announced",
+      "Release date for an announced game",
+      "Live music performance",
+      "Esports award presented",
+      "Winner thanks their family",
+      "A Nintendo reveal",
+      "A PlayStation reveal",
+      "An Xbox reveal",
+      "Fighting game character reveal",
+      "CGI trailer, no gameplay",
+      "Developer gets emotional on stage",
+      "Studio head on stage",
+      "Crossover or collab announced",
+      "Free-to-play game revealed",
+      "Awards handed out in a quick montage",
+      "A joke falls flat",
+      "Sponsored segment",
+      "Ends with a big final reveal",
+      "Mobile game gets a trailer",
+      "Movie or TV adaptation news",
+    ],
+    about: [
+      "Game Awards bingo covers both halves of the night: who takes home the awards and what gets revealed between them. Fill a grid with your predictions before the show, then mark squares off as they happen. Get a full row, column or diagonal and you've got bingo.",
+      "Create your card and you get one short link. Share it with friends, chat, whoever. Everyone who opens it plays the same predictions on their own screen, with nothing to install or sign up for. Hit Shuffle to rearrange your squares, or turn on Stream mode to hide the buttons while the card is on screen.",
+    ],
+    faq: [
+      {
+        question: "Is the Game Awards bingo card maker free?",
+        answer:
+          "Yes. Making cards, sharing them and playing along are all free, and there's no account to create.",
+      },
+      {
+        question: "Can I mix award winners and game reveals on one card?",
+        answer:
+          "Yes, and it makes for a better card. Put your Game of the Year pick next to the world premieres you're hoping for.",
+      },
+      {
+        question: "How do other people play along?",
+        answer:
+          "Share your card's link with friends, chat, whoever. Everyone who opens it gets the same card in their browser and marks their own squares.",
+      },
+      {
+        question: "How many predictions do I need?",
+        answer:
+          "8 for a 3 × 3 card with a free space, 24 for a 5 × 5 and 48 for a 7 × 7. Add a few extra and Shuffle mixes them in.",
+      },
+      {
+        question: "Is this site affiliated with The Game Awards?",
+        answer:
+          "No. Video Game Bingo is a fan-made site and isn't affiliated with or endorsed by The Game Awards.",
+      },
+    ],
+    updated: "2026-10-13",
+  },
 ];
 
 export const getEvent = (slug: string) =>

@@ -42,13 +42,13 @@ export const THEMES = {
     accentColor: "#22c55e",
   },
   gameAwards: {
-    themeName: "Game Awards",
-    backgroundColor: "#1a1a1a", // Dark, classy background
-    textColor: "#00d4ff", // Neon blue (from their branding)
-    borderColor: "#003b4d",
-    hoverColor: "#006b89",
-    shadowColor: "#00000099",
-    accentColor: "#00d4ff",
+    themeName: "The Game Awards",
+    backgroundColor: "#141210", // Near-black, like the show's branding
+    textColor: "#e8c49a", // Gold from the logo
+    borderColor: "#4a3a28",
+    hoverColor: "#211c17",
+    shadowColor: "#050505",
+    accentColor: "#d9a56b",
   },
   summerGameFest: {
     themeName: "Summer Game Fest",
@@ -64,10 +64,11 @@ export const THEMES = {
 export type ThemeKey = keyof typeof THEMES;
 export type Theme = (typeof THEMES)[ThemeKey];
 
-// Themes offered in the card maker (Game Awards and Summer Game Fest aren't ready yet)
+// Themes offered in the card maker (Summer Game Fest isn't ready yet)
 export const PICKER_THEMES: ThemeKey[] = [
   "classicBingo",
   "nintendoDirect",
   "playstationStateOfPlay",
   "xbox",
+  "gameAwards",
 ];

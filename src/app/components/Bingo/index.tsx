@@ -126,12 +126,20 @@ const BingoCard = ({ card }: { card: CardState }) => {
 
         <div className="flex justify-center">
           {platformLogo ? (
-            <div className="max-w-full rounded-xl bg-white px-4 py-2 shadow-lg sm:px-6">
+            <div
+              className={`max-w-full overflow-hidden rounded-xl shadow-lg ${
+                platformLogo.hasBackground ? "" : "bg-white px-4 py-2 sm:px-6"
+              }`}
+            >
               <Image
-                src={platformLogo}
+                src={platformLogo.image}
                 alt={`${theme.themeName} logo`}
                 width={700}
-                className="h-auto max-h-9 w-auto max-w-full sm:max-h-12 lg:max-h-14"
+                className={`h-auto w-auto max-w-full ${
+                  platformLogo.hasBackground
+                    ? "max-h-13 sm:max-h-16 lg:max-h-18"
+                    : "max-h-9 sm:max-h-12 lg:max-h-14"
+                }`}
               />
             </div>
           ) : (

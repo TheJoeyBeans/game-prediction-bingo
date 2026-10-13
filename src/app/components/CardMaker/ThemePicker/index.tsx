@@ -8,7 +8,7 @@ interface ThemePickerProps {
 }
 
 const ThemePicker = ({ selected, onChange }: ThemePickerProps) => (
-  <div className="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
+  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
     {PICKER_THEMES.map((key) => {
       const theme = THEMES[key];
       const active = selected === key;
