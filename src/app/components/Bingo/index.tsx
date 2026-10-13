@@ -1,10 +1,17 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { sendGTMEvent } from "@next/third-parties/google";
 import Board from "../Board";
+import Confetti from "../Confetti";
 import Backdrop from "../ui/Backdrop";
 import Button, { buttonStyles } from "../ui/Button";
 import DisplayMenu from "../ui/DisplayMenu";
@@ -24,6 +31,7 @@ import { PLATFORM_LOGOS } from "../../utils/logos";
 import {
   boardSlots,
   cellToOption,
+  completedLines,
   isFreeCell,
   optionToCell,
 } from "../../utils/boardLayout";
@@ -50,8 +58,23 @@ const BingoCard = ({ card }: { card: CardState }) => {
   );
   const theme = THEMES[themeKey];
   const platformLogo = PLATFORM_LOGOS[themeKey];
+  const bingoLines = useMemo(
+    () => completedLines(gridSize, includeFreeSpace, selected),
+    [gridSize, includeFreeSpace, selected]
+  );
+  const [confettiBurst, setConfettiBurst] = useState(0);
+  // Lines already celebrated, so only a newly completed line sets off confetti
+  const celebratedLines = useRef(0);
   // Hidden controls keep their space so the board doesn't jump in stream mode
   const controlsVisibility = streamMode ? "invisible" : "";
+
+  useEffect(() => {
+    if (bingoLines.length > celebratedLines.current) {
+      sendGTMEvent({ event: "bingo", lines: bingoLines.length });
+      setConfettiBurst((burst) => burst + 1);
+    }
+    celebratedLines.current = bingoLines.length;
+  }, [bingoLines.length]);
 
   // Read after mounting, since the server can't know this browser's preference
   useEffect(() => {
@@ -88,16 +111,22 @@ const BingoCard = ({ card }: { card: CardState }) => {
       ])
     );
 
-    setOptions(order.map((i) => options[i]));
-    setSelected(
-      new Set(
-        [...selected].map((cell) =>
-          isFreeCell(cell, gridSize, includeFreeSpace)
-            ? cell
-            : newCell.get(cellToOption(cell, gridSize, includeFreeSpace))!
-        )
+    const nextSelected = new Set(
+      [...selected].map((cell) =>
+        isFreeCell(cell, gridSize, includeFreeSpace)
+          ? cell
+          : newCell.get(cellToOption(cell, gridSize, includeFreeSpace))!
       )
     );
+    // A shuffle can line marks up by chance; that shouldn't count as a new bingo
+    celebratedLines.current = completedLines(
+      gridSize,
+      includeFreeSpace,
+      nextSelected
+    ).length;
+
+    setOptions(order.map((i) => options[i]));
+    setSelected(nextSelected);
   };
 
   const handleStreamModeChange = (enabled: boolean) => {
@@ -235,6 +264,7 @@ const BingoCard = ({ card }: { card: CardState }) => {
       <main className="flex flex-1 items-center justify-center px-3 py-2 sm:px-6">
         <Board
           soft={softColors}
+          bingoLines={bingoLines}
           gridSize={gridSize}
           options={options}
           includeFreeSpace={includeFreeSpace}
@@ -258,6 +288,20 @@ const BingoCard = ({ card }: { card: CardState }) => {
           {SHARE_LABELS[shareStatus]}
         </Button>
       </footer>
+
+      <Confetti
+        burst={confettiBurst}
+        colors={[
+          theme.accentColor,
+          theme.markerColor,
+          theme.textColor,
+          theme.backgroundColor,
+        ]}
+      />
+      <p className="sr-only" aria-live="polite">
+        {bingoLines.length > 0 &&
+          `Bingo! ${bingoLines.length} ${bingoLines.length === 1 ? "line" : "lines"} complete.`}
+      </p>
     </div>
   );
 };

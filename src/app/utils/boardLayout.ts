@@ -25,3 +25,26 @@ export const optionToCell = (
   gridSize: number,
   includeFreeSpace: boolean
 ) => (includeFreeSpace && option >= centerCell(gridSize) ? option + 1 : option);
+
+// Every row, column and both diagonals, as lists of cells
+const boardLines = (gridSize: number) => {
+  const cells = Array.from({ length: gridSize }, (_, i) => i);
+  return [
+    ...cells.map((row) => cells.map((col) => row * gridSize + col)),
+    ...cells.map((col) => cells.map((row) => row * gridSize + col)),
+    cells.map((i) => i * gridSize + i),
+    cells.map((i) => i * gridSize + (gridSize - 1 - i)),
+  ];
+};
+
+// Lines where every square is marked; the free space always counts
+export const completedLines = (
+  gridSize: number,
+  includeFreeSpace: boolean,
+  selected: Set<number>
+) =>
+  boardLines(gridSize).filter((line) =>
+    line.every(
+      (cell) => selected.has(cell) || isFreeCell(cell, gridSize, includeFreeSpace)
+    )
+  );

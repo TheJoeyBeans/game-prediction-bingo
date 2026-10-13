@@ -28,7 +28,25 @@ interface BoardProps {
   swap?: Pick<Swap, "picked" | "drag" | "pick" | "startDrag">;
   // Easier on the eyes: neutral squares with the theme's color on borders and marks, and no glow
   soft?: boolean;
+  // Completed rows, columns or diagonals (as lists of cells) to draw a line through
+  bingoLines?: number[][];
 }
+
+// A line through a completed row, column or diagonal, in the board's 0–100 coordinates,
+// running from the center of its first square to its last and a little past each end
+const lineEnds = (line: number[], gridSize: number) => {
+  const center = (cell: number) => ({
+    x: ((cell % gridSize) + 0.5) * (100 / gridSize),
+    y: (Math.floor(cell / gridSize) + 0.5) * (100 / gridSize),
+  });
+  const start = center(line[0]);
+  const end = center(line[line.length - 1]);
+  const length = Math.hypot(end.x - start.x, end.y - start.y);
+  const overhang = (0.3 * (100 / gridSize)) / length;
+  const dx = (end.x - start.x) * overhang;
+  const dy = (end.y - start.y) * overhang;
+  return { x1: start.x - dx, y1: start.y - dy, x2: end.x + dx, y2: end.y + dy };
+};
 
 const Board = ({
   gridSize,
@@ -40,6 +58,7 @@ const Board = ({
   fitViewport = false,
   swap,
   soft = false,
+  bingoLines = [],
 }: BoardProps) => {
   const theme = THEMES[themeKey];
   // Soft colors use the site's surface and text colors, so they follow light and dark mode
@@ -75,7 +94,7 @@ const Board = ({
       }}
     >
       <div
-        className="grid gap-1 sm:gap-1.5"
+        className="relative grid gap-1 sm:gap-1.5"
         style={
           {
             gridTemplateColumns: `repeat(${gridSize}, minmax(0, 1fr))`,
@@ -152,6 +171,31 @@ const Board = ({
             </Cell>
           );
         })}
+
+        {bingoLines.length > 0 && (
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            className="pointer-events-none absolute inset-0 z-20 h-full w-full overflow-visible"
+          >
+            {bingoLines.map((line) => (
+              <line
+                key={line.join("-")}
+                {...lineEnds(line, gridSize)}
+                stroke={colors.marker}
+                strokeWidth={7}
+                strokeLinecap="round"
+                strokeOpacity={0.9}
+                vectorEffect="non-scaling-stroke"
+                pathLength={1}
+                strokeDasharray={1}
+                className="animate-draw motion-reduce:animate-none"
+                style={{ filter: `drop-shadow(0 0 6px ${colors.marker})` }}
+              />
+            ))}
+          </svg>
+        )}
       </div>
     </div>
   );
