@@ -190,3 +190,4 @@ Changes from the plan above, made while building:
 - **No footer links.** The home page has a "Bingo for every showcase" section and each event page has "More showcase bingo", so every page already links to every event page. The footer stays short.
 - **New analytics event:** `use_starter_predictions` (parameter `theme`, the event's name). It needs adding to the "Site events" trigger in Tag Manager.
 - **Site-wide 404 page** (`src/app/not-found.tsx`), because unknown top-level paths now return 404 through the event route.
+- **Content trimmed after review.** Each event page has a short "About" text and the FAQ, inside a collapsed "About [event] bingo" section below the links to other events. The "What usually happens" sections were dropped, along with any claims about show length or scheduling. Copy invites people to "share it with friends, chat, whoever" rather than speaking only to streamers.

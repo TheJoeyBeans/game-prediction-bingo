@@ -31,8 +31,8 @@ export default function BingoHome() {
             Bingo for every showcase
           </h2>
           <p className="mt-3 max-w-2xl text-mist-300">
-            Each showcase has its own card maker with starter predictions, so
-            you can have a card ready before the stream starts.
+            Each showcase has its own card maker with starter predictions to
+            get you going.
           </p>
           <div className="mt-6">
             <EventLinks />

@@ -3,11 +3,6 @@ import type { ThemeKey } from "./constants";
 // Each showcase gets a landing page at /<slug>, built from this list along with its
 // sitemap entry, share image and links. Adding an event here (with a finished theme) adds its page.
 
-export interface EventSection {
-  heading: string;
-  paragraphs: string[];
-}
-
 export interface EventFaq {
   question: string;
   answer: string;
@@ -25,7 +20,8 @@ export interface ShowcaseEvent {
   intro: string;
   // Evergreen predictions, not tied to one show, so the page never looks stale
   starterPredictions: string[];
-  sections: EventSection[];
+  // Shown in a collapsed "About" section with the FAQ; mostly there for search engines
+  about: string[];
   faq: EventFaq[];
   // Bump when the page's content changes; feeds the sitemap
   updated: string;
@@ -38,10 +34,10 @@ export const EVENTS: ShowcaseEvent[] = [
     name: "Nintendo Direct",
     title: "Nintendo Direct Bingo Card Maker",
     description:
-      "Make a free Nintendo Direct bingo card in seconds. Start from ready-made predictions, share one short link with your chat, and play along live.",
+      "Make a free Nintendo Direct bingo card in seconds. Use ready-made predictions or your own, share it with friends, chat, whoever, and play along live.",
     heading: "Nintendo Direct Bingo Card Maker",
     intro:
-      "Fill a card with your Nintendo Direct predictions, or start from ours, then share one link so your friends or chat can play along while the show is live.",
+      "Fill a card with your Nintendo Direct predictions or start from ours. Share it with friends, chat, whoever, and play along live.",
     starterPredictions: [
       "Shadow drop during the show",
       "Ends with \"one more thing\"",
@@ -72,31 +68,11 @@ export const EVENTS: ShowcaseEvent[] = [
       "Long-dormant series returns",
       "Sequel to a recent hit",
       "Developer speaks on camera",
-      "Chat begs for F-Zero",
+      "F-Zero returns",
     ],
-    sections: [
-      {
-        heading: "What is Nintendo Direct bingo?",
-        paragraphs: [
-          "Nintendo Directs are Nintendo's online presentations where it reveals new games, release dates and updates. Nintendo Direct bingo turns the guessing that happens before every show into a game: fill a grid with what you think Nintendo will announce, then mark squares off as they happen. Complete a row, column or diagonal and you've got bingo.",
-          "It works just as well for a full Direct, a shorter Direct Mini or a Partner Showcase. The fun is in the predictions, from safe bets like a release date for a game already announced to long shots like the return of a series fans have been waiting on for years.",
-        ],
-      },
-      {
-        heading: "How to play Nintendo Direct bingo with your chat",
-        paragraphs: [
-          "Add your predictions, pick a board size and click Create my card. You get one short link to drop in chat, Discord or a group text. Everyone who opens it gets the same predictions and marks their own squares as the show plays out, with nothing to install or sign up for.",
-          "Viewers can hit Shuffle to get their own layout, so not everyone gets bingo at the same moment. If you're streaming, switch on Stream mode to fade the buttons away so only the board is on screen.",
-          "A 5 × 5 card is the classic choice for a full Direct. Try 3 × 3 for a quick Direct Mini, or 7 × 7 if you want a card that lasts the whole show.",
-        ],
-      },
-      {
-        heading: "What usually happens in a Nintendo Direct",
-        paragraphs: [
-          "Nintendo often announces a Direct only a day or so before it airs, so it helps to have a card ready fast. That's what the starter predictions are for: they cover the moments that show up again and again, and you can edit any of them.",
-          "Some patterns are close to tradition. The biggest reveal is usually saved for the end, often introduced with a \"one more thing.\" Games sometimes release the moment the show ends, known as a shadow drop. Ports and remasters of older games are common, as are release dates for games announced in earlier Directs, paid DLC and free updates for recent hits. These make great squares because they're likely, but never guaranteed.",
-        ],
-      },
+    about: [
+      "Nintendo Direct bingo is simple: before the show, fill a grid with what you think Nintendo will announce, then mark squares off as they happen. Get a full row, column or diagonal and you've got bingo.",
+      "Create your card and you get one short link. Share it with friends, chat, whoever. Everyone who opens it plays the same predictions on their own screen, with nothing to install or sign up for. Hit Shuffle to rearrange your squares, or turn on Stream mode to hide the buttons while the card is on screen.",
     ],
     faq: [
       {
@@ -105,14 +81,14 @@ export const EVENTS: ShowcaseEvent[] = [
           "Yes. Making cards, sharing them and playing along are all free, and there's no account to create.",
       },
       {
-        question: "How do my viewers play along?",
+        question: "How do other people play along?",
         answer:
-          "Share your card's link. Each viewer opens the same card in their browser and marks their own squares as the Direct plays out.",
+          "Share your card's link with friends, chat, whoever. Everyone who opens it gets the same card in their browser and marks their own squares.",
       },
       {
         question: "How many predictions do I need?",
         answer:
-          "8 for a 3 × 3 card with a free space, 24 for a 5 × 5 and 48 for a 7 × 7. Add a few extra and Shuffle mixes them in for variety.",
+          "8 for a 3 × 3 card with a free space, 24 for a 5 × 5 and 48 for a 7 × 7. Add a few extra and Shuffle mixes them in.",
       },
       {
         question: "Can I edit the starter predictions?",
@@ -133,10 +109,10 @@ export const EVENTS: ShowcaseEvent[] = [
     name: "State of Play",
     title: "State of Play Bingo Card Maker",
     description:
-      "Make a free PlayStation State of Play bingo card in seconds. Use ready-made predictions or your own, then share one link with your chat.",
+      "Make a free PlayStation State of Play bingo card in seconds. Use our predictions or your own, share it with friends, chat, whoever, and play along live.",
     heading: "PlayStation State of Play Bingo Card Maker",
     intro:
-      "Build a State of Play bingo card from your own predictions or ours, then share a single link so your chat can mark off squares during the show.",
+      "Build a State of Play bingo card from your own predictions or ours. Share it with friends, chat, whoever, and play along live.",
     starterPredictions: [
       "New PlayStation exclusive revealed",
       "Ends with a big final reveal",
@@ -167,52 +143,32 @@ export const EVENTS: ShowcaseEvent[] = [
       "Delay announced",
       "Anime game trailer",
       "Studio teases its next game",
-      "Show runs over 30 minutes",
+      "Sequel to a PS4 favorite",
     ],
-    sections: [
-      {
-        heading: "What is State of Play bingo?",
-        paragraphs: [
-          "State of Play is PlayStation's online showcase for new games, trailers and release dates across PS5 and PS VR2. State of Play bingo makes the wait more fun: fill a grid with your predictions before the show, then mark each one off as it happens. Get a full row, column or diagonal to win.",
-          "Every State of Play is a little different. Some are short updates on a handful of games, others are long showcases full of first-party and third-party reveals, so a good card mixes safe bets with a few wild guesses.",
-        ],
-      },
-      {
-        heading: "How to play State of Play bingo with your chat",
-        paragraphs: [
-          "Add predictions, choose a board size and click Create my card. You'll get a short link that everyone can open, whether you post it in Twitch chat, Discord or a group chat. Each person marks their own card in the browser, with no app or account needed.",
-          "Shuffle gives each viewer a different layout of the same predictions, so the race to bingo stays interesting. Streamers can turn on Stream mode to hide the controls and keep a clean board on screen.",
-          "Go with 5 × 5 for a typical show, 3 × 3 for a short State of Play, or 7 × 7 for a long one.",
-        ],
-      },
-      {
-        heading: "What usually happens in a State of Play",
-        paragraphs: [
-          "Sony usually announces a State of Play a few days ahead, which gives you time to argue with chat about what to include. The starter predictions above cover the beats that show up across many shows, so you can start there and add your own.",
-          "Recurring moments include a headline reveal held for the end of the show, games that are available to play the moment the show ends, new trailers and dates for PlayStation Studios games, and plenty of third-party trailers, from Japanese RPGs to horror. PS VR2 games, PC versions and remakes of older classics come up often too.",
-        ],
-      },
+    about: [
+      "State of Play bingo turns PlayStation's showcase into a game: fill a grid with your predictions before the show, then mark each one off as it happens. Complete a row, column or diagonal to win.",
+      "Once you create your card, you get a short link. Share it with friends, chat, whoever. Everyone plays the same predictions in their own browser, with no app or account needed. Shuffle rearranges your squares, and Stream mode hides the buttons for a clean board on screen.",
     ],
     faq: [
       {
         question: "Is the State of Play bingo card maker free?",
         answer:
-          "Yes, it's completely free. There's no sign-up, and your viewers don't need an account either.",
+          "Yes, it's completely free. There's no sign-up for you or anyone you share your card with.",
       },
       {
-        question: "How does my chat get the card?",
+        question: "How do I share my card?",
         answer:
-          "After you create your card, share its link. Anyone who opens it can play along and mark squares as the State of Play goes on.",
+          "After you create your card, share its link with friends, chat, whoever. Anyone who opens it can play along and mark their own squares.",
       },
       {
         question: "What board size should I use?",
         answer:
-          "5 × 5 fits most shows and needs 24 predictions with the free space. A 3 × 3 card needs 8, and a 7 × 7 card needs 48.",
+          "5 × 5 is the classic and needs 24 predictions with the free space. A 3 × 3 card needs 8, and a 7 × 7 card needs 48.",
       },
       {
         question: "Does everyone get the same card?",
         answer:
-          "Everyone gets the same predictions. Each viewer can press Shuffle to rearrange the squares on their own card.",
+          "Everyone gets the same predictions. Each person can press Shuffle to rearrange the squares on their own card.",
       },
       {
         question: "Is this site affiliated with PlayStation or Sony?",
@@ -228,10 +184,10 @@ export const EVENTS: ShowcaseEvent[] = [
     name: "Xbox Games Showcase",
     title: "Xbox Games Showcase Bingo Card Maker",
     description:
-      "Make a free Xbox Games Showcase bingo card in seconds. Start from ready-made predictions, share one short link with your chat, and play live.",
+      "Make a free Xbox Games Showcase bingo card in seconds. Use our predictions or your own, share it with friends, chat, whoever, and play along live.",
     heading: "Xbox Games Showcase Bingo Card Maker",
     intro:
-      "Make an Xbox Games Showcase bingo card with your predictions or ours, then share one link so everyone can play along during the show.",
+      "Make an Xbox Games Showcase bingo card with your predictions or ours. Share it with friends, chat, whoever, and play along live.",
     starterPredictions: [
       "\"Day one with Game Pass\"",
       "World premiere trailer",
@@ -254,50 +210,30 @@ export const EVENTS: ShowcaseEvent[] = [
       "Obsidian RPG news",
       "An executive on stage",
       "Ends with \"one more thing\"",
-      "Deep dive on one game after the show",
+      "Deep dive on one game",
       "Hardware tease",
       "PC and cloud play mentioned",
       "Sequel to a cult classic",
       "Delay announced",
       "CGI trailer, no gameplay",
       "Developer interview segment",
-      "Show runs over an hour",
-      "Chat argues about exclusives",
+      "Brand-new Xbox IP",
+      "Revival of a classic Xbox series",
     ],
-    sections: [
-      {
-        heading: "What is Xbox Games Showcase bingo?",
-        paragraphs: [
-          "The Xbox Games Showcase is Microsoft's big yearly presentation, usually held in June, with new games from Xbox Game Studios, Bethesda, Activision and Blizzard alongside partners from around the world. Xbox Games Showcase bingo turns your predictions into a game: fill a grid before the show and mark off each one as it's announced.",
-          "With so many studios under one roof, there's a lot to predict, from new entries in long-running series to surprise reveals from studios that have been quiet for years.",
-        ],
-      },
-      {
-        heading: "How to play Xbox Games Showcase bingo with your chat",
-        paragraphs: [
-          "Add your predictions, choose a board size and click Create my card. Share the short link in Twitch chat, Discord or anywhere else, and everyone gets the same predictions to mark off on their own screen. Nobody needs to install anything or create an account.",
-          "Shuffle lets each viewer rearrange their squares so bingo doesn't land for everyone at once. Turn on Stream mode to hide the buttons when the card is on your stream.",
-          "The showcase is usually a long show, so a 5 × 5 card works well and a 7 × 7 card is a good challenge.",
-        ],
-      },
-      {
-        heading: "What usually happens in an Xbox Games Showcase",
-        paragraphs: [
-          "The showcase tends to open with a major reveal and end with one too, and it's often followed by a longer deep dive into a single game. Expect plenty of games launching on Game Pass, release dates for games announced in previous years, and \"available today\" surprises.",
-          "Because Xbox now publishes some of its games on other platforms too, which games come to PlayStation, PC and the cloud is part of the conversation. Big franchises like Halo, Gears of War, Forza, Call of Duty, Fallout and The Elder Scrolls are always good squares, whether or not they appear.",
-        ],
-      },
+    about: [
+      "Xbox Games Showcase bingo turns your predictions into a game: fill a grid before the show and mark off each one as it's announced. Line up a row, column or diagonal for bingo.",
+      "Create your card and share its short link with friends, chat, whoever. Everyone gets the same predictions to mark off on their own screen, and nobody needs to install anything or create an account. Shuffle rearranges your squares, and Stream mode hides the buttons when the card is on screen.",
     ],
     faq: [
       {
         question: "Is the Xbox Games Showcase bingo card maker free?",
         answer:
-          "Yes. It's free to make and share cards, and there's nothing for you or your viewers to sign up for.",
+          "Yes. It's free to make and share cards, and there's nothing for anyone to sign up for.",
       },
       {
-        question: "How do I share my card with my stream?",
+        question: "How do I share my card?",
         answer:
-          "Create your card and share its link in chat. Each viewer opens the card in their browser and marks their own squares.",
+          "Create your card and share its link with friends, chat, whoever. Each person opens it in their browser and marks their own squares.",
       },
       {
         question: "How many predictions do I need?",
@@ -305,9 +241,9 @@ export const EVENTS: ShowcaseEvent[] = [
           "With a free space: 8 for 3 × 3, 24 for 5 × 5 and 48 for 7 × 7. Extra predictions get mixed in when you shuffle.",
       },
       {
-        question: "Can I use the same card for the deep dive after the showcase?",
+        question: "Can I change the starter predictions?",
         answer:
-          "Sure. Your card stays playable, so you can keep marking squares through any follow-up show.",
+          "Yes. Keep the ones you like, remove the rest and add your own before creating the card.",
       },
       {
         question: "Is this site affiliated with Xbox or Microsoft?",

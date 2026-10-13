@@ -13,7 +13,7 @@ export default function Image({ params }: { params: { event: string } }) {
   const event = getEvent(params.event);
   return renderOgImage({
     title: event ? `${event.name} Bingo` : "Video Game Bingo",
-    subtitle: "Make a prediction bingo card and play along live with your chat",
+    subtitle: "Make a prediction bingo card and play along live",
     themeKey: event?.themeKey ?? "classicBingo",
   });
 }
