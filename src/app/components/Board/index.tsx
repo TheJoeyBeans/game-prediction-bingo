@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { THEMES, type ThemeKey } from "../../lib/constants";
 import type { Swap } from "../CardMaker/useSwap";
+import { cellToOption, isFreeCell } from "../../utils/boardLayout";
 
 // Largest a cell gets; below that the board shrinks to fit its container
 const MAX_CELL_REM = 7;
@@ -39,7 +40,6 @@ const Board = ({
 }: BoardProps) => {
   const theme = THEMES[themeKey];
   const totalCells = gridSize * gridSize;
-  const centerIndex = Math.floor((totalCells - 1) / 2);
   const maxWidth = `${gridSize * MAX_CELL_REM}rem`;
 
   return (
@@ -64,9 +64,8 @@ const Board = ({
         }
       >
         {Array.from({ length: totalCells }, (_, index) => {
-          const isFreeSpace = includeFreeSpace && index === centerIndex;
-          const optionIndex =
-            includeFreeSpace && index > centerIndex ? index - 1 : index;
+          const isFreeSpace = isFreeCell(index, gridSize, includeFreeSpace);
+          const optionIndex = cellToOption(index, gridSize, includeFreeSpace);
           const text = isFreeSpace ? "Free Space" : options[optionIndex] || "";
           const isSelected = selected?.has(index) ?? false;
           const swappable =

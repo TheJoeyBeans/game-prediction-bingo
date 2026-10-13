@@ -18,6 +18,12 @@ import {
 import { THEMES } from "../../lib/constants";
 import { themedButtonStyle } from "../../lib/themeStyles";
 import { PLATFORM_LOGOS } from "../../utils/logos";
+import {
+  boardSlots,
+  cellToOption,
+  isFreeCell,
+  optionToCell,
+} from "../../utils/boardLayout";
 import { shuffleBoard } from "../../utils/shuffleBoard";
 import type { CardState } from "../../utils/url-helpers";
 
@@ -46,10 +52,40 @@ const BingoCard = ({ card }: { card: CardState }) => {
     return () => clearTimeout(timer);
   }, [shareStatus]);
 
+  // Marks stay with their predictions, and marked predictions stay on the board,
+  // so only unmarked ones trade places with the extras
   const handleShuffleBoard = () => {
     sendGTMEvent({ event: "shuffle_board" });
-    setSelected(new Set());
-    setOptions(shuffleBoard([...options]));
+    const slots = boardSlots(gridSize, includeFreeSpace);
+    const markedOptions = [...selected]
+      .filter((cell) => !isFreeCell(cell, gridSize, includeFreeSpace))
+      .map((cell) => cellToOption(cell, gridSize, includeFreeSpace));
+    const unmarked = shuffleBoard(
+      options.map((_, i) => i).filter((i) => !markedOptions.includes(i))
+    );
+    const unmarkedOnBoard = slots - markedOptions.length;
+    // New order, as indexes into the old order
+    const order = [
+      ...shuffleBoard([...markedOptions, ...unmarked.slice(0, unmarkedOnBoard)]),
+      ...unmarked.slice(unmarkedOnBoard),
+    ];
+    const newCell = new Map(
+      order.map((oldOption, position) => [
+        oldOption,
+        optionToCell(position, gridSize, includeFreeSpace),
+      ])
+    );
+
+    setOptions(order.map((i) => options[i]));
+    setSelected(
+      new Set(
+        [...selected].map((cell) =>
+          isFreeCell(cell, gridSize, includeFreeSpace)
+            ? cell
+            : newCell.get(cellToOption(cell, gridSize, includeFreeSpace))!
+        )
+      )
+    );
   };
 
   const handleStreamModeChange = (enabled: boolean) => {
