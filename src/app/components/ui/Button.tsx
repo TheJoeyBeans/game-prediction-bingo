@@ -4,9 +4,9 @@ const VARIANTS = {
   primary:
     "bg-accent-500 text-white shadow-[0_8px_30px_-8px_var(--color-accent-500)] hover:bg-accent-400 disabled:bg-ink-700 disabled:text-mist-500 disabled:shadow-none",
   secondary:
-    "bg-ink-800/90 text-mist-100 ring-1 ring-inset ring-white/10 hover:bg-ink-700 disabled:text-mist-500",
+    "bg-ink-800/90 text-mist-100 ring-1 ring-inset ring-veil/10 hover:bg-ink-700 disabled:text-mist-500",
   ghost:
-    "text-mist-300 hover:bg-white/5 hover:text-mist-100 disabled:text-mist-500",
+    "text-mist-300 hover:bg-veil/5 hover:text-mist-100 disabled:text-mist-500",
 };
 
 const SIZES = {

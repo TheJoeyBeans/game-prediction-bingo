@@ -14,7 +14,7 @@ const EventContent = ({ event }: { event: ShowcaseEvent }) => (
       </div>
     </section>
 
-    <details className="group mt-12 max-w-3xl rounded-2xl bg-ink-900/80 ring-1 ring-inset ring-white/10">
+    <details className="group mt-12 max-w-3xl rounded-2xl bg-ink-900/80 ring-1 ring-inset ring-veil/10">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 font-display font-semibold text-mist-100 sm:p-5 [&::-webkit-details-marker]:hidden">
         About {event.name} bingo
         <span
@@ -32,7 +32,7 @@ const EventContent = ({ event }: { event: ShowcaseEvent }) => (
           ))}
         </div>
 
-        <dl className="divide-y divide-white/10 border-t border-white/10">
+        <dl className="divide-y divide-veil/10 border-t border-veil/10">
           {event.faq.map((item) => (
             <div key={item.question} className="py-4">
               <dt className="font-semibold text-mist-100">{item.question}</dt>

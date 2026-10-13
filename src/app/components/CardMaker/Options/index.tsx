@@ -96,7 +96,7 @@ const Options = ({ options, setOptions, needed, starter, swap }: OptionsProps) =
   return (
     <div className="space-y-4">
       {starter && missingStarter.length > 0 && (
-        <div className="flex flex-col gap-3 rounded-xl bg-white/[0.04] p-3 ring-1 ring-inset ring-white/10 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-xl bg-veil/[0.04] p-3 ring-1 ring-inset ring-veil/10 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-mist-300">
             {count === 0
               ? `Short on time? Start with ${missingStarter.length} ${starter.eventName} predictions and edit from there.`
@@ -126,7 +126,7 @@ const Options = ({ options, setOptions, needed, starter, swap }: OptionsProps) =
           placeholder="e.g. Surprise shadow drop"
           autoComplete="off"
           maxLength={MAX_PREDICTION_LENGTH}
-          className="h-11 min-w-0 flex-1 rounded-xl bg-ink-950/60 px-4 text-sm text-mist-100 ring-1 ring-inset ring-white/10 placeholder:text-mist-500 focus:ring-2 focus:ring-accent-400 focus:outline-none"
+          className="h-11 min-w-0 flex-1 rounded-xl bg-ink-950/60 px-4 text-sm text-mist-100 ring-1 ring-inset ring-veil/10 placeholder:text-mist-500 focus:ring-2 focus:ring-accent-400 focus:outline-none"
         />
         <Button type="submit" variant="secondary" aria-label="Add prediction">
           <PlusIcon className="text-base" />
@@ -140,7 +140,7 @@ const Options = ({ options, setOptions, needed, starter, swap }: OptionsProps) =
       </p>
 
       <div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+        <div className="h-1.5 overflow-hidden rounded-full bg-veil/10">
           <div
             className={`h-full rounded-full transition-[width] duration-300 ${
               count >= needed ? "bg-success" : "bg-accent-500"
@@ -160,7 +160,7 @@ const Options = ({ options, setOptions, needed, starter, swap }: OptionsProps) =
 
       {swap.picked !== null && (
         <p
-          className="rounded-lg bg-white/[0.06] px-3 py-2 text-sm text-mist-100"
+          className="rounded-lg bg-veil/[0.06] px-3 py-2 text-sm text-mist-100"
           aria-live="polite"
         >
           Swapping &ldquo;{options[swap.picked]}&rdquo;. Tap another
@@ -182,10 +182,10 @@ const Options = ({ options, setOptions, needed, starter, swap }: OptionsProps) =
                 data-swap-index={i}
                 className={`inline-flex max-w-full items-center gap-1 rounded-lg py-1 pr-1 pl-1 text-sm ring-inset transition duration-100 ${
                   isPicked
-                    ? "bg-ink-600 ring-2 ring-white"
+                    ? "bg-ink-600 ring-2 ring-mist-100"
                     : isDropTarget
-                      ? "bg-ink-700 ring-2 ring-white/70"
-                      : "bg-ink-800 ring-1 ring-white/10"
+                      ? "bg-ink-700 ring-2 ring-veil/70"
+                      : "bg-ink-800 ring-1 ring-veil/10"
                 } ${i >= needed && !isPicked ? "opacity-50" : ""} ${
                   swap.drag?.from === i ? "opacity-40" : ""
                 }`}
@@ -215,7 +215,7 @@ const Options = ({ options, setOptions, needed, starter, swap }: OptionsProps) =
                   type="button"
                   onClick={() => setEditing(i)}
                   aria-label={`Edit "${option}"`}
-                  className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-md text-mist-500 transition-colors hover:bg-white/10 hover:text-mist-100"
+                  className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-md text-mist-500 transition-colors hover:bg-veil/10 hover:text-mist-100"
                 >
                   <EditIcon />
                 </button>
@@ -223,7 +223,7 @@ const Options = ({ options, setOptions, needed, starter, swap }: OptionsProps) =
                   type="button"
                   onClick={() => handleDeleteOption(i)}
                   aria-label={`Remove "${option}"`}
-                  className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-md text-mist-500 transition-colors hover:bg-white/10 hover:text-mist-100"
+                  className="grid h-8 w-8 shrink-0 cursor-pointer place-items-center rounded-md text-mist-500 transition-colors hover:bg-veil/10 hover:text-mist-100"
                 >
                   <CloseIcon />
                 </button>
@@ -252,7 +252,7 @@ const Options = ({ options, setOptions, needed, starter, swap }: OptionsProps) =
           <Button
             variant="ghost"
             size="sm"
-            className="border border-dashed border-white/20"
+            className="border border-dashed border-veil/20"
             onClick={() =>
               setOptions(shuffleBoard([...SAMPLE_OPTIONS]).slice(0, needed))
             }

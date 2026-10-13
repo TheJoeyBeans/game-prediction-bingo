@@ -13,7 +13,7 @@ const Backdrop = ({ glow = true }: { glow?: boolean }) => (
         }}
       />
     )}
-    <div className="absolute inset-0 bg-[radial-gradient(rgb(255_255_255/0.07)_1px,transparent_1px)] bg-size-[24px_24px] mask-[linear-gradient(to_bottom,black,transparent_70%)]" />
+    <div className="absolute inset-0 bg-[radial-gradient(color-mix(in_srgb,var(--color-veil)_7%,transparent)_1px,transparent_1px)] bg-size-[24px_24px] mask-[linear-gradient(to_bottom,black,transparent_70%)]" />
   </div>
 );
 

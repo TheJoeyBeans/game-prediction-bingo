@@ -11,6 +11,7 @@ import StepPanel from "./StepPanel";
 import { useSwap } from "./useSwap";
 import Backdrop from "../ui/Backdrop";
 import Button from "../ui/Button";
+import ColorModeButton from "../ui/ColorModeButton";
 import SegmentedControl from "../ui/SegmentedControl";
 import Toggle from "../ui/Toggle";
 import Wordmark from "../ui/Wordmark";
@@ -112,15 +113,16 @@ const CardMaker = ({
     >
       <Backdrop />
 
-      <header className="mx-auto flex w-full max-w-7xl items-center px-4 py-5 sm:px-6 lg:px-8">
+      <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
         <Link href="/" aria-label="Video Game Bingo home">
           <Wordmark className="text-lg" />
         </Link>
+        <ColorModeButton />
       </header>
 
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 pb-12 sm:px-6 lg:px-8">
         <section className="max-w-3xl py-6 sm:py-10">
-          <h1 className="bg-linear-to-br from-white to-mist-300 bg-clip-text font-display text-[clamp(2.25rem,4vw+1rem,4rem)] leading-[1.05] font-bold tracking-tight text-transparent">
+          <h1 className="bg-linear-to-br from-mist-100 to-mist-300 bg-clip-text font-display text-[clamp(2.25rem,4vw+1rem,4rem)] leading-[1.05] font-bold tracking-tight text-transparent">
             {heading}
           </h1>
           <p className="mt-4 max-w-2xl text-base text-mist-300 sm:text-lg">
@@ -238,7 +240,7 @@ const CardMaker = ({
       {swap.drag && (
         <div
           aria-hidden="true"
-          className="pointer-events-none fixed z-50 max-w-60 truncate rounded-lg bg-ink-700 px-3 py-1.5 text-sm text-mist-100 shadow-xl ring-1 ring-white/20"
+          className="pointer-events-none fixed z-50 max-w-60 truncate rounded-lg bg-ink-700 px-3 py-1.5 text-sm text-mist-100 shadow-xl ring-1 ring-veil/20"
           style={{ left: swap.drag.x + 14, top: swap.drag.y + 14 }}
         >
           {options[swap.drag.from]}

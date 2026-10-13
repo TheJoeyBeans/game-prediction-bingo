@@ -14,7 +14,7 @@ const EventLinks = ({ exclude }: { exclude?: string }) => (
           style={
             { "--swatch": THEMES[event.themeKey].accentColor } as CSSProperties
           }
-          className="group flex h-full items-center justify-between gap-3 rounded-xl bg-ink-900/80 p-4 ring-1 ring-inset ring-white/10 transition duration-150 hover:ring-(--swatch)"
+          className="group flex h-full items-center justify-between gap-3 rounded-xl bg-ink-900/80 p-4 ring-1 ring-inset ring-veil/10 transition duration-150 hover:ring-(--swatch)"
         >
           <span>
             <span className="block font-display font-semibold text-mist-100">

@@ -65,7 +65,7 @@ const Board = ({
 
   return (
     <div
-      className="mx-auto w-full rounded-2xl p-1.5 ring-1 ring-white/15 sm:p-2.5"
+      className="mx-auto w-full rounded-2xl p-1.5 ring-1 ring-veil/15 sm:p-2.5"
       style={{
         maxWidth: fitViewport
           ? `min(${maxWidth}, max(18rem, calc(100dvh - 15rem)))`

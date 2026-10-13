@@ -40,7 +40,7 @@ const DisplayMenu = ({ children }: { children: ReactNode }) => {
       {open && (
         <div
           id={panelId}
-          className="absolute top-full right-0 z-40 mt-2 w-64 space-y-4 rounded-xl bg-ink-800 p-4 shadow-2xl ring-1 ring-white/10"
+          className="absolute top-full right-0 z-40 mt-2 w-64 space-y-4 rounded-xl bg-ink-800 p-4 shadow-2xl ring-1 ring-veil/10"
         >
           {children}
         </div>

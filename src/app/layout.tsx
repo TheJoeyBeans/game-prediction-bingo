@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import CookieConsent from "./components/CookieConsent";
 import { SITE_URL } from "./lib/constants";
+import { COLOR_MODE_SCRIPT } from "./lib/colorModeScript";
 import { CONSENT_DEFAULTS_SCRIPT } from "./lib/consent";
 import "./globals.css";
 
@@ -11,8 +12,11 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const grotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-grotesk" });
 
 export const viewport: Viewport = {
-  themeColor: "#07080d",
-  colorScheme: "dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5f6fa" },
+    { media: "(prefers-color-scheme: dark)", color: "#07080d" },
+  ],
+  colorScheme: "dark light",
 };
 
 export const metadata: Metadata = {
@@ -42,8 +46,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${grotesk.variable}`}>
+    // The head script may set data-color-mode before React loads, which is expected
+    <html
+      lang="en"
+      className={`${inter.variable} ${grotesk.variable}`}
+      suppressHydrationWarning
+    >
       <head>
+        <script dangerouslySetInnerHTML={{ __html: COLOR_MODE_SCRIPT }} />
         <script dangerouslySetInnerHTML={{ __html: CONSENT_DEFAULTS_SCRIPT }} />
       </head>
       <body>

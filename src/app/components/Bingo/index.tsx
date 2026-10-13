@@ -17,6 +17,7 @@ import {
   ShuffleIcon,
 } from "../ui/icons";
 import { THEMES } from "../../lib/constants";
+import { useColorMode } from "../../lib/colorMode";
 import { readPreference, savePreference } from "../../lib/preferences";
 import { themedButtonStyle } from "../../lib/themeStyles";
 import { PLATFORM_LOGOS } from "../../utils/logos";
@@ -41,6 +42,7 @@ const BingoCard = ({ card }: { card: CardState }) => {
   const { gridSize, includeFreeSpace, themeKey } = card;
   const [streamMode, setStreamMode] = useState(false);
   const [softColors, setSoftColors] = useState(false);
+  const [colorMode, changeColorMode] = useColorMode();
   const [selected, setSelected] = useState(() => new Set<number>());
   const [options, setOptions] = useState(card.options);
   const [shareStatus, setShareStatus] = useState<"idle" | "copied" | "failed">(
@@ -219,6 +221,12 @@ const BingoCard = ({ card }: { card: CardState }) => {
               className="flex w-full justify-between"
               checked={softColors}
               onChange={handleSoftColorsChange}
+            />
+            <Toggle
+              label="Light mode"
+              className="flex w-full justify-between"
+              checked={colorMode === "light"}
+              onChange={(light) => changeColorMode(light ? "light" : "dark")}
             />
           </DisplayMenu>
         </div>
