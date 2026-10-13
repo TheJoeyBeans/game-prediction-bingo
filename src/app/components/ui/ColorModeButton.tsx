@@ -11,13 +11,15 @@ const ColorModeButton = () => {
 
   return (
     <Button
-      variant="ghost"
       size="sm"
       aria-label={`Switch to ${next} mode`}
       title={`Switch to ${next} mode`}
       onClick={() => mode && changeMode(next)}
     >
-      {mode === "light" ? <MoonIcon /> : <SunIcon />}
+      {next === "dark" ? <MoonIcon /> : <SunIcon />}
+      <span className="hidden sm:inline">
+        {next === "dark" ? "Dark mode" : "Light mode"}
+      </span>
     </Button>
   );
 };
