@@ -137,7 +137,7 @@ const BingoCard = ({ card }: { card: CardState }) => {
                 width={700}
                 className={`h-auto w-auto max-w-full ${
                   platformLogo.hasBackground
-                    ? "max-h-13 sm:max-h-16 lg:max-h-18"
+                    ? "max-h-15 sm:max-h-18 lg:max-h-20"
                     : "max-h-9 sm:max-h-12 lg:max-h-14"
                 }`}
               />
