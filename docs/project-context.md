@@ -67,6 +67,7 @@ Write an implementation proposal in `docs/proposals/` before any code, as was do
 | Setup, environment variables, operations (moderation, cleanup, scheduled shows) | `README.md` |
 | Short links and user profiles design | `docs/proposals/short-card-urls.md` |
 | SEO and event pages design | `docs/proposals/seo-event-pages.md` |
+| Search Console "not indexed" investigation plan | `docs/proposals/search-console-redirects.md` |
 | What's configured in Tag Manager, GA4, Search Console, Bing | `docs/google-setup.md` |
 | Database schema and functions | `supabase/migrations/` |
 | Skills | `/google-updates`, `/db-migrations`, `/release` |
